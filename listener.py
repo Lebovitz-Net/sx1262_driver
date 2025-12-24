@@ -72,7 +72,7 @@ def on_rx():
     """
     status = lora.status()
 
-    if status == lora.STATUS_RX_DONE:
+    if status == STATUS_RX_DONE:
         available = lora.available()
         data = lora.get(available)
 
@@ -86,13 +86,13 @@ def on_rx():
         print(f"SNR:   {snr:.1f} dB")
         print("------------------------")
 
-    elif status == lora.STATUS_CRC_ERR:
+    elif status == STATUS_CRC_ERR:
         print("CRC error")
 
-    elif status == lora.STATUS_HEADER_ERR:
+    elif status == STATUS_HEADER_ERR:
         print("Header error")
 
-    elif status == lora.STATUS_RX_TIMEOUT:
+    elif status == STATUS_RX_TIMEOUT:
         print("RX timeout (unexpected in continuous mode)")
     else:
         print("Nada")
