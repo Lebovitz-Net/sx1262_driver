@@ -126,7 +126,7 @@ def main():
 
     radio = lora  # or whatever the reference driver class is called
 
-    start_background_rssi(radio, interval=5)
+    # start_background_rssi(radio, interval=5)
     start_irq_polling(lora)
 
 
