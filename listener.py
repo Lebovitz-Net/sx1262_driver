@@ -51,6 +51,19 @@ def start_background_rssi(driver, interval=5):
     t = threading.Thread(target=loop, daemon=True)
     t.start()
 
+def start_irq_polling(driver, interval=0.01):
+    def loop():
+        while True:
+            irq = driver.getIrqStatus()
+
+            if irq:
+                # Let the driver decode the IRQ and call on_rx()
+                driver._interruptRx(None)
+
+            time.sleep(interval)
+
+    t = threading.Thread(target=loop, daemon=True)
+    t.start()
 
 
 def on_rx():
@@ -109,6 +122,8 @@ def main():
     radio = lora  # or whatever the reference driver class is called
 
     start_background_rssi(radio, interval=5)
+    start_irq_polling(lora)
+
 
 
     # Frequency
