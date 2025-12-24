@@ -291,7 +291,7 @@ class SX126x(BaseLoRa) :
 ### COMMON OPERATIONAL METHODS ###
 
     def begin(self, bus: int = _bus, cs: int = _cs, reset: int = _reset, busy: int = _busy, irq: int = _irq, txen: int = _txen, rxen: int = _rxen, wake: int = _wake) :
-
+        print(f"pins: bus: {bus} cs:{cs} reset:{reset} irq: {irq} busy: {busy}")
         # set spi and gpio pins
         self.setSpi(bus, cs)
         self.setPins(reset, busy, irq, txen, rxen, wake)
@@ -311,6 +311,12 @@ class SX126x(BaseLoRa) :
         self.sleep(self.SLEEP_COLD_START)
         spi.close()
         gpio.cleanup()
+
+    def getStatus(self):
+        resp = self._readBytes(0xC0, 1)
+        if not resp:
+            return None
+        return resp[0]
 
     def reset(self) -> bool :
 
@@ -734,6 +740,11 @@ class SX126x(BaseLoRa) :
         # set operation status to wait and attach RX interrupt handler
         if self._irq != -1 :
             gpio.remove_event_detect(self._irq)
+            print("IRQ pin:", self._irq)
+            print("IRQ mode:", gpio.gpio_function(self._irq))
+            print("IRQ level:", gpio.input(self._irq))
+
+            gpio.remove_event_detect(16)
             if timeout == self.RX_CONTINUOUS :
                 gpio.add_event_detect(self._irq, gpio.RISING, callback=self._interruptRxContinuous, bouncetime=10)
             else :
@@ -1200,6 +1211,20 @@ class SX126x(BaseLoRa) :
         buf = self._readBytes(0xC0, 1)
         return buf[0]
 
+    def getChipStatus(self):
+        # 0xC0 = GET_STATUS
+        # Transaction: send opcode, then 1 dummy to clock out status
+        if self.busyCheck():
+            return None  # chip is busy, no status
+
+        gpio.output(self._cs_define, gpio.LOW)
+        resp = spi.xfer2([0xC0, 0x00])  # [undefined, status]
+        gpio.output(self._cs_define, gpio.HIGH)
+
+        # resp[0] is garbage during opcode; resp[1] is the status byte
+        return resp
+
+
     def getRxBufferStatus(self) -> tuple :
         buf = self._readBytes(0x13, 3)
         return buf[1:3]
@@ -1211,6 +1236,27 @@ class SX126x(BaseLoRa) :
     def getRssiInst(self) -> int :
         buf = self._readBytes(0x15, 2)
         return buf[1]
+
+    def getFullRssiInst(self):
+        resp = self._readBytes(0x15, 2)
+        status = resp[0]
+        rssi_raw = resp[1]
+
+        # Convert raw RSSI to dBm
+        rssi_dbm = -rssi_raw / 2.0
+
+        return status, rssi_dbm
+
+    def decode_status(self, status):
+        mode = status & 0x07
+        modes = {
+            1: "STBY_RC",
+            2: "STBY_XOSC",
+            3: "FS",
+            4: "RX",
+            5: "TX"
+        }
+        return modes.get(mode, "UNKNOWN")
 
     def getStats(self) -> tuple :
         buf = self._readBytes(0x10, 7)

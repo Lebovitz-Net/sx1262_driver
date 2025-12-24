@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import time
+import threading
+import time
 from SX126x import SX126x   # adjust if your driver file has a different name
 
 # ------------------------------------------------------------
@@ -23,6 +25,31 @@ PREAMBLE_LENGTH = 12
 PAYLOAD_LENGTH = 32
 CRC_ENABLED = True
 INVERT_IQ = False
+
+
+
+def start_background_rssi(driver, interval=5):
+    """
+    driver.get_rssi_inst() must return instantaneous RSSI in dBm.
+    Runs forever in a daemon thread.
+    """
+    def loop():
+        while True:
+            try:
+                status, rssi = driver.getFullRssiInst()
+                print("RSSI:", rssi)
+                # Flush the SPI bus with a dummy transaction
+                resp = driver.getChipStatus()
+                print("Raw GET_STATUS bytes:", resp)
+
+
+            except Exception as e:
+                print("RSSI monitor error:", e)
+            time.sleep(interval)
+
+    t = threading.Thread(target=loop, daemon=True)
+    t.start()
+
 
 
 def on_rx():
@@ -67,7 +94,7 @@ def main():
         cs=SPI_DEV,
         reset=RESET_PIN,
         busy=BUSY_PIN,
-        irq=IRQ_PIN,
+        irq=-1,
         txen=-1,
         rxen=-1,
         wake=-1
@@ -77,6 +104,11 @@ def main():
         raise RuntimeError("SX1262 failed to enter STDBY_RC. Check BUSY, RESET, NSS wiring.")
 
     print("Configuring radio…")
+
+    radio = lora  # or whatever the reference driver class is called
+
+    start_background_rssi(radio, interval=5)
+
 
     # Frequency
     lora.setFrequency(FREQUENCY_HZ)
