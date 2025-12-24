@@ -1,4 +1,4 @@
-import RPi.GPIO
+import RPi.GPIO as gpio
 
 # SX126X register map
 REG_FSK_WHITENING_INITIAL_MSB          = 0x06B8

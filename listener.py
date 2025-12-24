@@ -2,7 +2,8 @@
 import time
 import threading
 import time
-from SX126x import SX126x   # adjust if your driver file has a different name
+from sx1262_constants import *
+from sx1262 import SX1262 as SX126x # adjust if your driver file has a different name
 
 # ------------------------------------------------------------
 # Pin mapping (BCM) — confirmed by your continuity testing
@@ -123,7 +124,7 @@ def main():
 
     # Packet parameters
     lora.setLoRaPacket(
-        headerType=lora.HEADER_EXPLICIT,
+        headerType=HEADER_EXPLICIT,
         preambleLength=PREAMBLE_LENGTH,
         payloadLength=PAYLOAD_LENGTH,
         crcType=CRC_ENABLED,
@@ -131,7 +132,7 @@ def main():
     )
 
     # Optional: boosted gain
-    lora.setRxGain(lora.RX_GAIN_BOOSTED)
+    lora.setRxGain(RX_GAIN_BOOSTED)
 
     # Register callback
     lora.onReceive(on_rx)
@@ -139,7 +140,7 @@ def main():
     print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz…")
     print("Waiting for packets…")
 
-    ok = lora.request(lora.RX_CONTINUOUS)
+    ok = lora.request(RX_CONTINUOUS)
     if not ok:
         raise RuntimeError("Failed to enter RX_CONTINUOUS mode.")
 
