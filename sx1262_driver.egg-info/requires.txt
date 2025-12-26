@@ -1,2 +1,0 @@
-lgpio
-spidev
