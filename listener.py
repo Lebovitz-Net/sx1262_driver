@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import time
 
-from sx1262_constants import *
-from sx1262 import SX1262 as SX126x  # adjust if needed
+from sx1262_driver import SX1262
+from sx1262_driver import *   # brings in LORA_SYNC_WORD_PUBLIC, HEADER_EXPLICIT, TX_SINGLE, etc.
 
 # ------------------------------------------------------------
 # Pin mapping (BCM)

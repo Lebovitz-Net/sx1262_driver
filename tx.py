@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import time
 
-from sx1262_constants import *
-from sx1262 import SX1262 as SX126x  # adjust if needed
+from sx1262_driver import SX1262
+from sx1262_driver import *   # brings in LORA_SYNC_WORD_PUBLIC, HEADER_EXPLICIT, TX_SINGLE, etc.
 
 # ------------------------------------------------------------
 # Pin mapping (BCM)
@@ -25,7 +25,6 @@ PAYLOAD_LENGTH = 32
 CRC_ENABLED = True
 INVERT_IQ = False
 
-
 # ------------------------------------------------------------
 # Event Handlers
 # ------------------------------------------------------------
@@ -35,20 +34,16 @@ async def handle_tx_done(transmit_time=None, irq_status=None):
     print(f"Transmit time: {transmit_time*1000:.2f} ms")
     print("-------------------")
 
-
 async def handle_timeout(irq_status=None):
     print("TX timeout")
-
 
 # ------------------------------------------------------------
 # Main
 # ------------------------------------------------------------
 
 def main():
-    global radio
-
     print("Initializing SX1262…")
-    radio = SX126x()
+    radio = SX1262()
 
     ok = radio.begin(
         bus=SPI_BUS,
@@ -66,13 +61,10 @@ def main():
 
     print("Configuring radio…")
 
-    # Sync word
     radio.set_sync_word(LORA_SYNC_WORD_PUBLIC)
 
-    # Frequency
     radio.set_frequency(FREQUENCY_HZ)
 
-    # LoRa modulation
     radio.set_lora_modulation(
         sf=SPREADING_FACTOR,
         bw=BANDWIDTH_HZ,
@@ -80,7 +72,6 @@ def main():
         ldro=False,
     )
 
-    # Packet parameters
     radio.set_lora_packet(
         header_type=HEADER_EXPLICIT,
         preamble_length=PREAMBLE_LENGTH,
@@ -89,23 +80,15 @@ def main():
         invert_iq=INVERT_IQ,
     )
 
-    # --------------------------------------------------------
-    # Register event handlers
-    # --------------------------------------------------------
     radio.on("tx_done", handle_tx_done)
     radio.on("timeout", handle_timeout)
 
     print("Transmitting packet…")
 
-    # --------------------------------------------------------
-    # Build and send a packet
-    # --------------------------------------------------------
     radio.begin_packet()
-
-    payload = b"Hello from SX1262!"
-    radio.put(payload)
-
+    radio.put(b"Hello from SX1262!")
     ok = radio.end_packet(TX_SINGLE)
+
     if not ok:
         raise RuntimeError("Failed to start TX")
 
@@ -117,7 +100,6 @@ def main():
     except KeyboardInterrupt:
         print("Shutting down…")
         radio.end()
-
 
 if __name__ == "__main__":
     main()
