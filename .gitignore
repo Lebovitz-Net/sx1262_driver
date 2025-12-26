@@ -26,3 +26,4 @@ keys
 !.vscode/extensions.json
 .idea
 .DS_Store
+sx1262_driver.egg-info
