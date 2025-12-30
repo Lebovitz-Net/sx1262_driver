@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import time
 
-from sx1262_driver import SX1262
-from sx1262_driver import *   # brings in LORA_SYNC_WORD_PUBLIC, HEADER_EXPLICIT, TX_SINGLE, etc.
+from ..sx1262_driver import SX1262
+from ..sx1262_driver import *   # brings in LORA_SYNC_WORD_PUBLIC, HEADER_EXPLICIT, TX_SINGLE, etc.
 
 # ------------------------------------------------------------
 # Pin mapping (BCM)
@@ -116,7 +116,7 @@ def main():
     radio.on("header_error", handle_header_error)
     radio.on("timeout", handle_timeout)
 
-    print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz…")
+    print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz BW {BANDWIDTH_HZ} SF {SPREADING_FACTOR} CR {CODING_RATE}")
     print("Waiting for packets…")
 
     ok = radio.request(RX_CONTINUOUS)

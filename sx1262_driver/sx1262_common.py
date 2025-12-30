@@ -99,9 +99,10 @@ class SX1262Common:
         Start a background thread that polls get_irq_status() and dispatches
         events via _handle_irq(). Safe to call multiple times.
         """
-        if getattr(self, "_recv_thread", None) and getattr(
-            self, "_recv_running", False
-        ):
+        recv_thread = getattr(self, "_recv_thread", None)
+        recv_running =  getattr(self, "_recv_running", False)
+        if recv_thread and recv_running:
+            print(f"can't start recv loop:  _recv_thread {recv_thread} _recv_running {recv_running}")
             return
 
         self._recv_interval = interval
