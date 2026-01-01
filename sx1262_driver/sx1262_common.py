@@ -90,6 +90,12 @@ class SX1262Common:
         if status is None:
             return 0
         return status & 0x70
+    
+    def get_control(self) -> int:
+        status = self.get_status()
+        if status is None:
+            return 0
+        return status & 0x0E
 
     # -------------------------------------------------------------------------
     # Externally called IRQ polling loop -> emits events via SX1262Interrupt._handle_irq
@@ -112,7 +118,7 @@ class SX1262Common:
         def loop():
             count = 0
             while self._recv_running:
-                mode = self.get_mode()
+                mode = self.get_mode() + self.get_control()
                 rssi = self.rssi_inst()
                 if count == 1000:
                     print(f"recv Loop rssi {rssi} mode {hex(mode)}")
