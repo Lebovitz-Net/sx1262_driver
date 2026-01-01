@@ -111,8 +111,10 @@ class SX1262Common:
         def loop():
             count = 0
             while self._recv_running:
+                mode = self.get_mode()
+                rssi = self.rssi_inst()
                 if count == 1000:
-                    print("recv Loop")
+                    print(f"recv Loop rssi {rssi} mode {mode}")
                     count = 0
                 else:
                     count += 1
