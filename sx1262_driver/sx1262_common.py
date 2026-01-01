@@ -109,7 +109,13 @@ class SX1262Common:
         self._recv_running = True
 
         def loop():
+            count = 0
             while self._recv_running:
+                if count == 1000:
+                    print("recv Loop")
+                    count = 0
+                else:
+                    count += 1
                 irq = self.get_irq_status()
                 if irq:
                     # Let SX1262Interrupt decode and emit events
