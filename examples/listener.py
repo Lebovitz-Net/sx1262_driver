@@ -136,7 +136,7 @@ async def main():
     print("Waiting for packets…")
 
     # IMPORTANT: Attach loop BEFORE starting radio threads
-    radio.events.attach_loop(asyncio.get_running_loop())
+    radio.attach_loop(asyncio.get_running_loop())
 
     # Start radio (creates recv thread)
     await radio.start()
