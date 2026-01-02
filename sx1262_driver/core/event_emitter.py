@@ -8,23 +8,16 @@ from typing import Callable, Dict, List
 class EventEmitter:
     def __init__(self):
         super().__init__()
-        loop = None
-        self._event_listeners: Dict[str, List[dict]] = defaultdict(list)
+class EventEmitter:
+    def __init__(self):
+        self._loop = None
+        self._loop_thread_id = None
+        self._event_listeners = defaultdict(list)
         self._lock = threading.Lock()
 
-        if loop is not None:
-            # Explicit loop provided
-            self._loop = loop
-        else:
-            try:
-                # Preferred: running loop if inside async context
-                self._loop = asyncio.get_running_loop()
-            except RuntimeError:
-                # Fallback: default loop (may not be running yet)
-                self._loop = asyncio.get_event_loop()
-
-        # Track the thread ID that owns this loop
-        self._loop_thread_id = getattr(self._loop, "_thread_id", threading.get_ident())
+    def attach_loop(self, loop):
+        self._loop = loop
+        self._loop_thread_id = getattr(loop, "_thread_id", threading.get_ident())
 
     def on(self, event: str, callback: Callable):
         with self._lock:
@@ -54,7 +47,7 @@ class EventEmitter:
             coro = self._safe_invoke(entry["callback"], *args, **kwargs)
 
             if current_thread_id != self._loop_thread_id:
-                print(f"[EventEmitter] Cross-thread emit detected for '{event}'")
+                # print(f"[EventEmitter] Cross-thread emit detected for '{event}'")
                 self._loop.call_soon_threadsafe(asyncio.create_task, coro)
             else:
                 self._loop.create_task(coro)
