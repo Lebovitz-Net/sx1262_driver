@@ -1,0 +1,153 @@
+--- PACKET RECEIVED ---
+Bytes: 72
+Data:  15 03 f3 54 df 37 6c a0 e5 92 10 e3 f7 72 b9 2e 8d 2d c9 c8 6c fa 57 d8 b8 c5 e7 a0 bf 59 eb 65 3a 66 9c 58 ae 46 31 fc 71 17 a0 bf b7 dc 82 35 6e f6 e1 3e c7 24 3c 48 9c 07 f3 7a 58 dd e9 92 bc 82 ad 7d 69 aa 63 d5
+RSSI:  -117.0 dBm
+SNR:   -7.5 dB
+------------------------
+
+--- PACKET RECEIVED ---
+Bytes: 122
+Data:  11 01 df 65 bb fb 4f e0 4c 01 0d d5 18 52 56 d4 e8 13 d9 c7 93 14 99 b7 41 aa 40 0a 6c 5a 4f 11 bf db 6c aa 75 4e 69 b6 a9 85 a7 04 ff c5 a2 2c 6d 57 35 11 77 5b 26 c1 25 05 de 89 1d 62 ff e3 2a a0 d9 ab 33 9b 3a 6f ce c4 9a df da 87 82 55 79 ba 71 0d 3a f0 68 4f 36 98 37 8a b8 ec 06 be a0 5d 46 21 50 03 05 92 48 47 86 02 5b a8 c3 fb 52 6f 6f 69 42 6f 73 74 6f 6e
+RSSI:  -117.0 dBm
+SNR:   -6.0 dB
+------------------------
+Header error
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 135
+Data:  11 01 df af 07 fc 20 05 e0 4d 08 dd a9 21 e6 49 85 e6 22 01 bf 97 4a e0 b0 e3 50 84 b8 04 22 9e d1 1a 2b b9 7f 4e 69 f6 8a af cb 7c 33 ad 29 f0 db 41 6f a0 1a dc f4 bf 0c 5e 78 5d 3a 79 91 51 62 25 a8 ea 02 f7 bb dd 49 20 28 cf 4f b2 1b 9c 46 51 99 73 73 60 78 cf 59 dc 16 58 5f f8 f4 95 55 37 7e b5 98 63 02 92 ac 5e 86 02 54 14 c3 fb 68 74 74 70 73 3a 2f 2f 6c 65 74 73 6d 65 2e 73 68 2f 20 2d 20 30 31
+RSSI:  -117.0 dBm
+SNR:   -8.0 dB
+------------------------
+
+--- PACKET RECEIVED ---
+Bytes: 117
+Data:  11 01 df 53 9d 93 ed 23 c3 a8 4a 8d 4b d8 49 3a cd 65 b6 23 18 9c ab 8d d9 b0 c4 f3 3a 69 38 49 8f c5 e6 3c a9 49 66 70 83 61 ad 59 13 6d 53 cd 3f bb ed 13 42 ac 46 e7 c6 a1 67 a4 3d c3 4b f1 86 4b 1a 3d 43 c1 fb ef fa d2 30 50 a2 e2 26 80 91 64 68 1d fc 6a 07 4c c0 08 48 22 36 38 f4 1c ed 7d c7 fd b3 6e 0d 91 88 22 86 02 fd c5 c2 fb 4b 44 31 4d 55
+RSSI:  -118.0 dBm
+SNR:   -8.0 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 41
+Data:  15 04 63 d5 ce df 11 93 3e c6 3f c7 d2 18 14 cf d8 fa a5 58 2c 7c fd 72 c2 b6 a5 63 b3 9f 06 90 56 30 89 38 34 b0 f1 1f 60
+RSSI:  -116.0 dBm
+SNR:   -8.5 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 135
+Data:  11 02 a8 df 36 fb 6f 01 ff 23 0d 8b 49 e8 3e 1d 0d 5b 30 db fe 86 da ef 86 97 3b 9f e7 7f 4b 3b 23 37 7c ef d5 af 75 66 f3 2c 44 f7 2b 80 22 d6 3d c5 99 5e 9d 02 df 29 d0 d5 72 79 a6 82 4f 06 83 8e 0e 7d 30 ce 88 5e b2 3b 54 bb 0e 1e eb ba e4 0b df 08 4a 02 87 dc e4 e7 38 c3 a9 7f 0f fa 45 0e 09 37 f4 b6 39 00 92 e8 a3 85 02 b8 6d c0 fb 57 65 6c 6c 65 73 6c 65 79 20 48 69 6c 6c 73 20 42 61 63 6b 75 70
+RSSI:  -118.0 dBm
+SNR:   -8.2 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 27
+Data:  01 05 a4 a2 1b ce df ee 53 ea bd a0 fc 61 57 00 6d d9 69 ec 87 86 20 c7 16 d4 ad
+RSSI:  -118.0 dBm
+SNR:   -8.5 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 57
+Data:  15 04 9f 1d ce df 21 d2 d2 9b af 19 f4 20 52 be 48 52 df 20 6d fd c3 48 86 68 14 7c 0b cc 1d ee 4b 65 72 83 33 95 c9 72 2b 42 96 b2 41 8e ef 34 59 75 e7 89 85 50 72 96 a7
+RSSI:  -118.0 dBm
+SNR:   -7.2 dB
+------------------------
+CRC error
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 11
+Data:  0d 05 c3 ba 11 fa df f1 f8 c4 22
+RSSI:  -118.0 dBm
+SNR:   -9.0 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 42
+Data:  15 05 8f 02 d5 54 df 11 70 c3 01 c4 cc 77 b7 a8 ef 80 a2 b4 5b 12 a8 aa 98 99 e6 3d cd 63 7e b4 59 3a 51 56 18 8a bc 61 67 59
+RSSI:  -118.0 dBm
+SNR:   -9.0 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 14
+Data:  0d 08 c3 8f ba 11 3c 36 fa df f8 d7 20 59
+RSSI:  -118.0 dBm
+SNR:   -8.5 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 26
+Data:  21 04 81 ce 65 df 9f fb 40 1b b0 3a 22 e3 a2 b6 2b 81 52 99 2e 85 71 e7 5e a8
+RSSI:  -118.0 dBm
+SNR:   -10.2 dB
+------------------------
+CRC error
+Header error
+~--- PACKET RECEIVED ---
+Bytes: 72
+Data:  15 03 f3 54 df 37 6c a0 e5 92 10 e3 f7 72 b9 2e 8d 2d c9 c8 6c fa 57 d8 b8 c5 e7 a0 bf 59 eb 65 3a 66 9c 58 ae 46 31 fc 71 17 a0 bf b7 dc 82 35 6e f6 e1 3e c7 24 3c 48 9c 07 f3 7a 58 dd e9 92 bc 82 ad 7d 69 aa 63 d5
+RSSI:  -117.0 dBm
+SNR:   -7.5 dB
+------------------------
+
+--- PACKET RECEIVED ---
+Bytes: 122
+Data:  11 01 df 65 bb fb 4f e0 4c 01 0d d5 18 52 56 d4 e8 13 d9 c7 93 14 99 b7 41 aa 40 0a 6c 5a 4f 11 bf db 6c aa 75 4e 69 b6 a9 85 a7 04 ff c5 a2 2c 6d 57 35 11 77 5b 26 c1 25 05 de 89 1d 62 ff e3 2a a0 d9 ab 33 9b 3a 6f ce c4 9a df da 87 82 55 79 ba 71 0d 3a f0 68 4f 36 98 37 8a b8 ec 06 be a0 5d 46 21 50 03 05 92 48 47 86 02 5b a8 c3 fb 52 6f 6f 69 42 6f 73 74 6f 6e
+RSSI:  -117.0 dBm
+SNR:   -6.0 dB
+------------------------
+Header error
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 135
+Data:  11 01 df af 07 fc 20 05 e0 4d 08 dd a9 21 e6 49 85 e6 22 01 bf 97 4a e0 b0 e3 50 84 b8 04 22 9e d1 1a 2b b9 7f 4e 69 f6 8a af cb 7c 33 ad 29 f0 db 41 6f a0 1a dc f4 bf 0c 5e 78 5d 3a 79 91 51 62 25 a8 ea 02 f7 bb dd 49 20 28 cf 4f b2 1b 9c 46 51 99 73 73 60 78 cf 59 dc 16 58 5f f8 f4 95 55 37 7e b5 98 63 02 92 ac 5e 86 02 54 14 c3 fb 68 74 74 70 73 3a 2f 2f 6c 65 74 73 6d 65 2e 73 68 2f 20 2d 20 30 31
+RSSI:  -117.0 dBm
+SNR:   -8.0 dB
+------------------------
+
+--- PACKET RECEIVED ---
+Bytes: 117
+Data:  11 01 df 53 9d 93 ed 23 c3 a8 4a 8d 4b d8 49 3a cd 65 b6 23 18 9c ab 8d d9 b0 c4 f3 3a 69 38 49 8f c5 e6 3c a9 49 66 70 83 61 ad 59 13 6d 53 cd 3f bb ed 13 42 ac 46 e7 c6 a1 67 a4 3d c3 4b f1 86 4b 1a 3d 43 c1 fb ef fa d2 30 50 a2 e2 26 80 91 64 68 1d fc 6a 07 4c c0 08 48 22 36 38 f4 1c ed 7d c7 fd b3 6e 0d 91 88 22 86 02 fd c5 c2 fb 4b 44 31 4d 55
+RSSI:  -118.0 dBm
+SNR:   -8.0 dB
+------------------------
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 41
+Data:  15 04 63 d5 ce df 11 93 3e c6 3f c7 d2 18 14 cf d8 fa a5 58 2c 7c fd 72 c2 b6 a5 63 b3 9f 06 90 56 30 89 38 34 b0 f1 1CRC error---------------
+Initializing SX1262…
+pins: bus: 0 cs:0 reset:18 irq:-1 busy:20
+Configuring radio…
+Starting continuous receive at 910.525000 MHz…
+Waiting for packets…
+Header error
+
+--- PACKET RECEIVED ---
+Bytes: 132
+Data:  11 03 36 a8 df 3c 48 a3 29 89 84 74 23 a6 23 26 7f 91 af 15 00 98 8d 8a 8c d5 ef 7c 3f 21 2f af 3d c7 29 a7 a4 f8 f2 7b 66 19 fd d7 e4 60 ad 93 1b f9 9f b3 c9 d4 b9 ac d7 61 92 ab 03 50 42 63 7d cd 19 a4 89 c1 6f 1e 09 3d b8 f2 40 d5 65 7c 10 b0 c4 a6 08 51 7e 16 56 cd 8b b7 19 af 2a de 5c 75 58 73 63 12 18 3b 0e 92 d4 6f 85 02 c7 36 c0 fb 57 65 6c 6c 65 73 6c 65 79 20 43 65 6e 74 72 61 6c 20
+RSSI:  -117.0 dBm
+SNR:   -9.0 dB
+------------------------
+CRC error
+CRC error
+
+--- PACKET RECEIVED ---
+Bytes: 135
+Data:  11 01 df af 07 fc 20 05 e0 4d 08 dd a9 21 e6 49 85 e6 22 01 bf 97 4a e0 b0 e3 50 84 b8 04 22 9e d1 1a 2b e9 a9 4e 69 a0 72 e5 a3 32 f8 7a 68 a7 e4 37 0c 48 5a 74 a1 de a0 6b 11 af 46 c6 57 6e 70 df 28 5b 9b 59 4d 39 ac 13 dc ff 57 ce e3 73 45 c9 5d cd a3 53 ce 39 12 ce 77 67 3f ff c2 dd 51 ac 77 5e 7b e2 04 92 ac 5e 86 02 54 14 c3 fb 68 74 74 70 73 3a 2f 2f 6c 65 74 73 6d 65 2e 73 68 2f 20 2d 20 30 31
+RSSI:  -117.0 dBm
+SNR:   -9.2 dB
+------------------------
+Shutting down…
