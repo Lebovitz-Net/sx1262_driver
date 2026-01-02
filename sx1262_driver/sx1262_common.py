@@ -94,6 +94,12 @@ class SX1262Common:
         if status is None:
             return 0
         return status & 0x70
+    
+    def get_mode_and_control(self) -> int:
+        status = self.get_status()
+        if status is None:
+            return 0
+        return status & 0x7E
 
     # -------------------------------------------------------------------------
     # Internal IRQ polling loop -> emits events via SX1262Interrupt._handle_irq
@@ -106,11 +112,12 @@ class SX1262Common:
         """
         if self._recv_thread and self._recv_running:
             return
-
+        print("Initiating Recv Loop")
         self._recv_interval = interval
         self._recv_running = True
 
         def loop():
+            print(f"Recv Loop Started {self._recv_running}")
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
@@ -125,7 +132,7 @@ class SX1262Common:
         """
         Stop the background IRQ polling loop.
         """
-        if not getattr(self, "_recv_running", False):
+        if not self._recv_running:
             return
 
         self._recv_running = False
