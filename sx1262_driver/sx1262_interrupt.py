@@ -57,7 +57,6 @@ class SX1262Interrupt:
         """
         if self._txen != -1:
             from lgpio import gpio_write
-
             gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
         # Apply RTC / timeout errata workaround
@@ -66,6 +65,7 @@ class SX1262Interrupt:
         # Cache IRQ status and RX buffer status
         self._status_irq = self.get_irq_status()
         (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
+        print(f"received data payload lengh {self._payload_tx_rx} index {self._buffer_index}")
 
         # EventEmitter: notify listeners of RX completion
         self.emit(
@@ -81,6 +81,7 @@ class SX1262Interrupt:
         """
         self._status_irq = self.get_irq_status()
         (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
+        print(f"received data payload lengh {self._payload_tx_rx} index {self._buffer_index}")
 
         self.emit(
             "rx_done",

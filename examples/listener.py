@@ -67,6 +67,7 @@ async def handle_rx_done(payload_length=None, buffer_index=None, irq_status=None
     print("\n--- PACKET RECEIVED ---")
     print(f"Bytes: {payload_length}")
     print(f"Data:  {data.hex(' ')}")
+    print(f"IRQ    {irq_status}")
     print(f"RSSI:  {rssi:.1f} dBm")
     print(f"SNR:   {snr:.1f} dB")
     print("------------------------")
