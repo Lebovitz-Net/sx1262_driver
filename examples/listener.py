@@ -149,13 +149,17 @@ async def main():
     print(f"Radio status is {hex(radio.get_mode_and_control())}")
     # print(f"sync word is {hex(radio.get_sync_word())}")
 
-    # Sleep forever
     try:
+        # Sleep forever
         await asyncio.Event().wait()
-    except KeyboardInterrupt:
+    finally:
+        # This ALWAYS runs, even on Ctrl+C
         print("Shutting down…")
         radio.end()
 
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        # Swallow the traceback so it looks clean
+        pass
