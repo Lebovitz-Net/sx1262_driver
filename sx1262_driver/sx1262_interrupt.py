@@ -99,9 +99,9 @@ class SX1262Interrupt:
         self._status_irq = irq
 
         if (irq & 0x2000) and self._status_wait == STATUS_RX_CONTINUOUS:
-            (length, _) = self.get_rx_buffer_status()
-            _  = self.get(length)
-            self.clear_irq_status(irq)
+            # (length, _) = self.get_rx_buffer_status()
+            # _  = self.get(length)
+            # self.clear_irq_status(irq)
             print(f".../handle_irq got startup IRQ, mode is {self.get_mode_and_control()}")
             return
         
