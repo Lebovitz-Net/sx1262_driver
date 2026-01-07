@@ -1,4 +1,5 @@
 import time
+import threading
 
 from .sx1262_constants import *
 
