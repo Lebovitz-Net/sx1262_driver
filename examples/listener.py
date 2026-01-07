@@ -147,7 +147,7 @@ async def main():
     # if not ok:
     #     raise RuntimeError("Failed to enter RX_CONTINUOUS mode.")
     
-    print(f"Radio status is {hex(radio.get_mode_and_control())}")
+    # print(f"Radio status is {hex(radio.get_mode_and_control())}")
     # print(f"sync word is {hex(radio.get_sync_word())}")
 
     try:
