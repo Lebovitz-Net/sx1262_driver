@@ -142,7 +142,6 @@ async def main():
     loop = asyncio.get_running_loop()
     radio.attach_loop(loop)
     radio.start_recv_loop()
-    await asyncio.Event().wait()
 
     ok = radio.request(RX_CONTINUOUS)
     if not ok:
@@ -152,7 +151,7 @@ async def main():
     # print(f"sync word is {hex(radio.get_sync_word())}")
 
     try:
-        # Sleep forever
+        print("starting program running")
         await asyncio.Event().wait()
     finally:
         # This ALWAYS runs, even on Ctrl+C
