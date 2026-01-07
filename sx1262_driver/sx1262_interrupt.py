@@ -102,6 +102,7 @@ class SX1262Interrupt:
             (length, _) = self.get_rx_buffer_status()
             _  = self.get(length)
             self.clear_irq_status(irq)
+            print(f".../handle_irq got startup IRQ, mode is {self.get_mode_and_control()}")
             return
         
         # TX done
