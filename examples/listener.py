@@ -156,7 +156,7 @@ async def main():
     finally:
         # This ALWAYS runs, even on Ctrl+C
         print("Shutting down…")
-        radio.end()
+        radio.end() 
 
 if __name__ == "__main__":
     try:
