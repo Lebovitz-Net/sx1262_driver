@@ -82,11 +82,10 @@ class SX1262Interrupt:
         This is called by the internal recv_loop.
         """
         # Keep legacy status() path in sync
-        print(".../handle_irq IRQ", hex(irq))
         self._status_irq = irq
 
         if (irq & 0x2000):
-            print(f".../handle_irq got spurious IRQ, mode is {hex(self.get_mode_and_control())}")
+            print(f".../handle_irq got spurious IRQ {hex(irq)}, mode is {hex(self.get_mode_and_control())}")
             return
         
         # TX done
