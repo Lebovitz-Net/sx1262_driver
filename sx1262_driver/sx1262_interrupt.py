@@ -53,36 +53,23 @@ class SX1262Interrupt:
         Restores TXEN (if used), applies _fix_rx_timeout(), reads RX buffer
         status, and emits 'rx_done' (or error events via _handle_irq()).
         """
-        if self._txen != -1:
-            from lgpio import gpio_write
-            gpio_write(self.gpio_chip, self._txen, self._tx_state)
+        if self._status_wait == STATUS_RX_CONTINUOUS:
+            if self._txen != -1:
+                from lgpio import gpio_write
+                gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
-        # Apply RTC / timeout errata workaround
-        self._fix_rx_timeout()
+            # Apply RTC / timeout errata workaround
+            self._fix_rx_timeout()
 
-        # Cache IRQ status and RX buffer status
-        (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
-        print(f"got rx_done, buffer status payload lenght is {self._payload_tx_rx} buffer offset is {self._buffer_index} irq is {self._status_irq}")
+        (payload_length, buffer_index) = self.get_rx_buffer_status()
+        print(f"got rx_done, buffer status payload lenght is {payload_length} buffer offset is {buffer_index} irq is {irq}")
 
         # EventEmitter: notify listeners of RX completion
         self.emit(
             "rx_done",
-            payload_length=self._payload_tx_rx,
-            buffer_index=self._buffer_index,
+            payload_length,
+            buffer_index,
             irq_status=irq
-        )
-
-    def _interrupt_rx_continuous(self, irq,_channel=None):
-        """
-        Internal RX handler for continuous mode; does not restore TXEN.
-        """
-        (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
-
-        self.emit(
-            "rx_done",
-            payload_length=self._payload_tx_rx,
-            buffer_index=self._buffer_index,
-            irq_status=irq,
         )
 
     # -------------------------------------------------------------------------
@@ -111,11 +98,7 @@ class SX1262Interrupt:
 
         # RX done (single or continuous)
         if irq & IRQ_RX_DONE:
-            # Decide which RX path to use based on current status_wait
-            if self._status_wait == STATUS_RX_CONTINUOUS:
-                self._interrupt_rx_continuous(irq)
-            else:
-                self._interrupt_rx(irq)
+            self._interrupt_rx(irq)
 
         # Timeout
         if irq & IRQ_TIMEOUT:
@@ -133,6 +116,7 @@ class SX1262Interrupt:
         # CAD events (if/when you use them)
         if irq & IRQ_CAD_DETECTED:
             self.emit("cad_detected", irq_status=irq)
+
         if irq & IRQ_CAD_DONE:
             self.emit("cad_done", irq_status=irq)
 
