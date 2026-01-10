@@ -70,11 +70,11 @@ def _start_recv_loop (driver, interval=0.01):
         while _recv_running:
             irq = driver.get_irq_status()
             if irq:
-                print(f"irq status is {irq}")
                 if driver._status_wait == STATUS_RX_CONTINUOUS:
                     driver._interrupt_rx_continuous(None)
                 else:
                     driver._interrupt_rx(None)
+                print(f"irq status is {irq}")
             time.sleep(interval)
 
     _recv_thread = threading.Thread(target=loop, daemon=True)
