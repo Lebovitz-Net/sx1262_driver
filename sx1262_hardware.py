@@ -1,4 +1,4 @@
-import lgpio
+import lgpio # type: ignore - pi only
 
 from sx1262_constants import *
 

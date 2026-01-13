@@ -27,7 +27,7 @@ class SX1262Interrupt:
 
         # restore TXEN
         if self._txen != -1:
-            from lgpio import gpio_write
+            from lgpio import gpio_write # type: ignore - pi only
 
             gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
@@ -40,7 +40,7 @@ class SX1262Interrupt:
         # not in continous mode
         if self._status_wait != STATUS_RX_CONTINUOUS:
             if self._txen != -1:
-                from lgpio import gpio_write
+                from lgpio import gpio_write # type: ignore - pi only
 
                 gpio_write(self.gpio_chip, self._txen, self._tx_state)
 

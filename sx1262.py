@@ -1,5 +1,5 @@
-import spidev
-import lgpio
+import spidev # type: ignore - pi only
+import lgpio # type: ignore - pi only
 import time
 
 from event_emitter import EventEmitter

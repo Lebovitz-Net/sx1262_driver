@@ -1,7 +1,7 @@
 import time
 
 from sx1262_constants import *
-import lgpio
+import lgpio # type : ignore - pi only
 
 
 class SX1262Common:
@@ -81,3 +81,9 @@ class SX1262Common:
         if status is None:
             return 0
         return status & 0x70
+
+    def get_mode_and_status(self) -> int:
+        status = self.get_status()
+        if status is None:
+            return 0
+        return status & 0x7E
