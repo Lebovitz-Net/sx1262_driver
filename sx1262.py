@@ -1,4 +1,3 @@
-from base import BaseLoRa
 import spidev
 import lgpio
 import time
