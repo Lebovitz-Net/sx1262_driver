@@ -3,6 +3,7 @@ import spidev
 import lgpio
 import time
 
+from event_emitter import EventEmitter
 from sx1262_vars import SX1262Vars
 from sx1262_api import SX1262Api
 from sx1262_common import SX1262Common
@@ -15,6 +16,7 @@ from sx1262_interrupt import SX1262Interrupt
 
 
 class SX1262(
+    EventEmitter,
     SX1262Vars,
     SX1262Api,
     SX1262Common,
@@ -24,7 +26,6 @@ class SX1262(
     SX1262Transmit,
     SX1262Status,
     SX1262Interrupt,
-    BaseLoRa,
 ):
     def __init__(self):
         super().__init__()
