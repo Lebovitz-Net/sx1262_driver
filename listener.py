@@ -158,7 +158,7 @@ async def main():
     _start_recv_loop(radio)
 
     # Sync word (public network)
-    radio.set_sync_word(LORA_SYNC_WORD_PUBLIC)
+    radio.set_sync_word(LORA_SYNC_WORD_PRIVATE)
 
     # Frequency
     radio.set_frequency(FREQUENCY_HZ)
