@@ -23,8 +23,8 @@ FREQUENCY_HZ = 910_525_000   # 910.525 MHz
 BANDWIDTH_HZ = 62_500        # 62.5 kHz
 SPREADING_FACTOR = 7
 CODING_RATE = 5              # 4/5
-PREAMBLE_LENGTH = 12
-PAYLOAD_LENGTH = 32
+# PREAMBLE_LENGTH = 12
+# PAYLOAD_LENGTH = 32
 CRC_ENABLED = True
 INVERT_IQ = False
 
@@ -176,8 +176,8 @@ async def main():
         header_type=HEADER_IMPLICIT, # documenation says IMPLICIT.
         preamble_length=PREAMBLE_LENGTH,
         payload_length=PAYLOAD_LENGTH,
-        crc_type=CRC_ENABLED,
-        invert_iq=INVERT_IQ,
+        crc_type=CRC_ON,
+        invert_iq=IQ_STANDARD
     )
 
     # Optional: boosted gain
