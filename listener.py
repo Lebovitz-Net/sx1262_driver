@@ -75,7 +75,7 @@ def _start_recv_loop (driver, interval=0.01):
                     driver._interrupt_rx_continuous(None)
                 else:
                     driver._interrupt_rx(None)
-                print(f"irq status is {hex(irq)}")
+                print(f"irq status is {hex(irq)} chip status is {driver.get_mode_and_status()}")
             time.sleep(interval)
 
     _recv_thread = threading.Thread(target=loop, daemon=True)
@@ -173,7 +173,7 @@ async def main():
 
     # Packet parameters
     radio.set_lora_packet(
-        header_type=HEADER_EXPLICIT,
+        header_type=HEADER_IMPLICIT, # documenation says IMPLICIT.
         preamble_length=PREAMBLE_LENGTH,
         payload_length=PAYLOAD_LENGTH,
         crc_type=CRC_ENABLED,
