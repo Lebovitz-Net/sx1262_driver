@@ -7,6 +7,53 @@ from sx1262_constants import *
 class SX1262Transmit:
     # TRANSMIT RELATED METHODS
 
+    def send_packet(
+        self,
+        payload: bytes,
+        tx_header_type=HEADER_IMPLICIT,
+        tx_preamble_length=None,
+        tx_crc_type=CRC_ON,
+        tx_invert_iq=IQ_STANDARD,
+        tx_payload_length=None,
+    ):
+
+        # --- 1. Save current RX/sniffer settings ---
+        saved_header_type     = self._header_type
+        saved_preamble_length = self._preamble_length
+        saved_payload_length  = self._payload_length
+        saved_crc_type        = self._crc_type
+        saved_invert_iq       = self._invert_iq
+
+        # --- 2. Determine TX parameters ---
+        if tx_payload_length is None:
+            tx_payload_length = len(payload)
+
+        if tx_preamble_length is None:
+            tx_preamble_length = saved_preamble_length  # usually 8 for MeshCore
+
+        # --- 3. Apply TX settings ---
+        self.set_lora_packet(
+            header_type     = tx_header_type,
+            preamble_length = tx_preamble_length,
+            payload_length  = tx_payload_length,
+            crc_type        = tx_crc_type,
+            invert_iq       = tx_invert_iq,
+        )
+
+        # --- 4. Transmit ---
+        self.begin_packet()
+        self.write(payload)
+        self.end_packet()
+
+        # --- 5. Restore RX/sniffer settings ---
+        self.set_lora_packet(
+            header_type     = saved_header_type,
+            preamble_length = saved_preamble_length,
+            payload_length  = saved_payload_length,
+            crc_type        = saved_crc_type,
+            invert_iq       = saved_invert_iq,
+        )
+
     def begin_packet(self):
         self._payload_tx_rx = 0
         self.set_buffer_base_address(
