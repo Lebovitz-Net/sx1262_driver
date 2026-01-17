@@ -1,7 +1,8 @@
 import time
 
 from sx1262_constants import *
-import lgpio # type : ignore - pi only
+
+import lgpio # type: ignore - pi only
 
 
 class SX1262Common:

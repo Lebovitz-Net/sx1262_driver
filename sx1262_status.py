@@ -1,5 +1,5 @@
 import time
-
+import lgpio # type: ignore - pi only
 from sx1262_constants import *
 
 class SX1262Status:
@@ -29,14 +29,14 @@ class SX1262Status:
             if self._txen != -1:
                 # restore TXEN pin
                 # value already in self._tx_state
-                from lgpio import gpio_write
+                from lgpio import gpio_write # type: ignore - pi only
 
                 gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
         elif self._status_wait == STATUS_RX_WAIT:
             (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
             if self._txen != -1:
-                from lgpio import gpio_write
+                from lgpio import gpio_write # type: ignore - pi only
 
                 gpio_write(self.gpio_chip, self._txen, self._tx_state)
             self._fix_rx_timeout()
