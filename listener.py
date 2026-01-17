@@ -100,18 +100,18 @@ def on_rx():
     status = radio.status()
 
     if status == STATUS_RX_DONE:
-        available = radio.available()
-        data = radio.get(available)
+        # available = radio.available()
+        # data = radio.get(available)
 
-        rssi = radio.packet_rssi()
-        snr = radio.snr()
+        # rssi = radio.packet_rssi()
+        # snr = radio.snr()
 
-        print("\n--- PACKET RECEIVED ---")
-        print(f"Bytes: {available}")
-        print(f"Data:  {data.hex(' ')}")
-        print(f"RSSI:  {rssi:.1f} dBm")
-        print(f"SNR:   {snr:.1f} dB")
-        print("------------------------")
+        # print("\n--- PACKET RECEIVED ---")
+        # print(f"Bytes: {available}")
+        # print(f"Data:  {data.hex(' ')}")
+        # print(f"RSSI:  {rssi:.1f} dBm")
+        # print(f"SNR:   {snr:.1f} dB")
+        # print("------------------------")
 
     elif status == STATUS_CRC_ERR:
         print("CRC error")
@@ -129,6 +129,17 @@ def on_rx():
 
 def handle_rx_done(payload_length, buffer_index, irq_status):
     print(f"RX done event: payload_length={payload_length}, buffer_index={buffer_index}, irq_status={hex(irq_status)}")
+    data = radio.get(payload_length)
+
+    rssi = radio.packet_rssi()
+    snr = radio.snr()
+
+    print("\n--- PACKET RECEIVED ---")
+    print(f"Bytes: {payload_length}")
+    print(f"Data:  {data.hex(' ')}")
+    print(f"RSSI:  {rssi:.1f} dBm")
+    print(f"SNR:   {snr:.1f} dB")
+    print("------------------------")
 
 async def main():
     global radio
