@@ -127,6 +127,8 @@ def on_rx():
     irq = radio.get_irq_status()
     radio.clear_irq_status(irq)
 
+def handle_rx_done(payload_length, buffer_index, irq_status):
+    print(f"RX done event: payload_length={payload_length}, buffer_index={buffer_index}, irq_status={hex(irq_status)}")
 
 async def main():
     global radio
@@ -145,6 +147,8 @@ async def main():
         rxen=-1,
         wake=-1,
     )
+
+    radio.on("rx_done", handle_rx_done)
 
     if not ok:
         raise RuntimeError("SX1262 failed to enter STDBY_RC. Check BUSY, RESET, NSS wiring.")
