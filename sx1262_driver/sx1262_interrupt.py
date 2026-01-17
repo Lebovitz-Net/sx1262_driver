@@ -79,7 +79,7 @@ class SX1262Interrupt:
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
-                    self._interrupt_rx(irq, None)
+                    self._handle_irq(irq, None)
                     print(f"irq status is {hex(irq)} chip status is {hex(self.get_mode_and_status())}")
                 time.sleep(interval)
             self._recv_stopped = True
@@ -106,7 +106,7 @@ class SX1262Interrupt:
     # Central IRQ decoder used by the recv_loop in SX1262Common
     # -------------------------------------------------------------------------
 
-    def _handle_irq(self, irq: int):
+    def _handle_irq(self, irq: int, _channel=None):
         """
         Decode IRQ bits and invoke internal handlers and/or emit events.
         This is called by the internal recv_loop.
@@ -120,11 +120,11 @@ class SX1262Interrupt:
         
         # TX done
         if irq & IRQ_TX_DONE:
-            self._interrupt_tx(irq)
+            self._interrupt_tx(irq, _channel)
 
         # RX done (single or continuous)
         if irq & IRQ_RX_DONE:
-            self._interrupt_rx(irq)
+            self._interrupt_rx(irq, _channel)
 
         # Timeout
         if irq & IRQ_TIMEOUT:
