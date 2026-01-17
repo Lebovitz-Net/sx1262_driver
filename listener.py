@@ -81,7 +81,7 @@ def _start_recv_loop (driver, interval=0.01):
     _recv_thread = threading.Thread(target=loop, daemon=True)
     _recv_thread.start()
 
-def _stop_recv_loop(self, radio):
+def _stop_recv_loop(radio):
     """
     Stop the background IRQ polling loop.
     """
