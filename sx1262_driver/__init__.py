@@ -1,4 +1,4 @@
-"""
+﻿"""
 SX1262 LoRa driver (lgpio + spidev, snake_case API)
 
 Public API:
@@ -6,8 +6,8 @@ Public API:
 - Constants from sx1262_constants
 """
 
-from .sx1262 import SX1262
-from .sx1262_constants import *
+from sx1262 import SX1262
+from sx1262_constants import *
 
 __all__ = [
     "SX1262",

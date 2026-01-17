@@ -1,1 +1,1 @@
-export PYTHONPATH=`pwd`:`pwd`/src
+export PYTHONPATH=`pwd`:`pwd`/src:`pwd`/sx1262_driver
