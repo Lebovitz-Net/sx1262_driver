@@ -100,6 +100,7 @@ def on_rx():
     status = radio.status()
 
     if status == STATUS_RX_DONE:
+        print("Packet received!")
         # available = radio.available()
         # data = radio.get(available)
 
