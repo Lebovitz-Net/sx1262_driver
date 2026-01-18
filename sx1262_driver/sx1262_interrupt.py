@@ -130,13 +130,13 @@ class SX1262Interrupt:
         """
         # Keep legacy status() path in sync
         self._status_irq = irq
+        error_status = IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT
+        irq_mask = ~(error_status | IRQ_RX_DONE) & 0xFF
+        print(f"handle_irq: irq={hex(irq)} mask={hex(irq_mask)}")
 
         if (irq & 0x2000):
             print(f".../handle_irq got spurious IRQ {hex(irq)}, mode is {hex(self.get_mode_and_control())}")
             return
-        error_status = IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT
-        irq_mask = ~(error_status | IRQ_RX_DONE) & 0xFF
-        print(f"handle_irq: irq={hex(irq)} mask={hex(irq_mask)}")
 
         # TX done
         if irq & IRQ_TX_DONE and not (irq & error_status):
