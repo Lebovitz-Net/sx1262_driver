@@ -30,6 +30,7 @@ class SX1262Receive:
             lgpio.gpio_write(self.gpio_chip, self._txen, 1)
 
         self.set_rx(rx_timeout)
+        self.busy_check()
 
         # NOTE: RPi.GPIO event callbacks removed; if you want
         # lgpio alert-based handling, we can add a small helper
