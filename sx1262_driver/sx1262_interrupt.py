@@ -53,8 +53,13 @@ class SX1262Interrupt:
             self.clear_irq_status(IRQ_ALL)
         (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
 
+        data =  None
+        if self._payload_tx_rx > 0:
+            data =  self.get(self._payload_tx_rx)
+
         self.emit(
             "rx_done",
+            data=data,
             payload_length=self._payload_tx_rx,
             buffer_index=self._buffer_index,
             irq_status=irq

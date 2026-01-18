@@ -137,9 +137,9 @@ def handle_timeout(irq_status):
 def handle_crc_error(irq_status):
     print(f"CRC error event: irq_status={hex(irq_status)}")
 
-def handle_rx_done(payload_length, buffer_index, irq_status):
+def handle_rx_done(data, payload_length, buffer_index, irq_status):
     print(f"RX done event: payload_length={payload_length}, buffer_index={buffer_index}, irq_status={hex(irq_status)}")
-    data = radio.get(payload_length)
+    # data = radio.get(payload_length)
 
     rssi = radio.packet_rssi()
     snr = radio.snr()
