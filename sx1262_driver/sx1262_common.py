@@ -95,7 +95,6 @@ class SX1262Common:
         return status & 0x7E
     
     def start(self, rx_timeout, interval=0.01):
-        self.wake()
         ok = self.request(rx_timeout)
         if not ok:
             raise RuntimeError("Failed to enter RX mode.")
