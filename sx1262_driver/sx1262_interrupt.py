@@ -50,8 +50,8 @@ class SX1262Interrupt:
 
             self._fix_rx_timeout()
         
-        if self._status_wait == STATUS_RX_CONTINUOUS:
-            self.clear_irq_status(IRQ_ALL)
+        # if self._status_wait == STATUS_RX_CONTINUOUS:
+        #     self.clear_irq_status(IRQ_ALL)
 
         (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
 
