@@ -173,7 +173,7 @@ class SX1262Interrupt:
             self.emit("cad_done", irq_status=irq)
 
         # Clear IRQs at the end to release the latch
-        self._busy_check()
+        self.busy_check()
 
         if (irq & ~error_status):
             self.clear_irq_status(irq & ~error_status)
