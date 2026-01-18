@@ -86,7 +86,7 @@ class SX1262Interrupt:
 
         if self._recv_thread and self._recv_running:
             return
-        
+        print("starting recv loop")
         self._recv_interval = interval
         
         def loop():
@@ -99,6 +99,7 @@ class SX1262Interrupt:
                     print(f"irq status is {hex(irq)} chip status is {hex(self.get_mode_and_status())}")
                 time.sleep(interval)
             self._recv_stopped = True
+            print("recv loop stopped")
 
         self._recv_thread = threading.Thread(target=loop, daemon=True)
         self._recv_thread.start()
