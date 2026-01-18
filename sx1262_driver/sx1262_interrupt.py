@@ -49,7 +49,8 @@ class SX1262Interrupt:
                 gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
             self._fix_rx_timeout()
-        else:
+        
+        if self._status_wait == STATUS_RX_CONTINUOUS:
             self.clear_irq_status(IRQ_ALL)
 
         (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()

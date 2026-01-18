@@ -182,7 +182,7 @@ async def main():
     # start_background_rssi(radio, interval=5)
 
     # Poll IRQ status in a background thread instead of GPIO edge callbacks
-    # radio._start_recv_loop()
+    # radio._start_recv_loop() -  moved to begin()
 
     # Sync word (public network)
     radio.set_sync_word(LORA_SYNC_WORD_PRIVATE)
@@ -216,10 +216,8 @@ async def main():
     print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz…")
     print("Waiting for packets…")
 
-    ok = radio.request(RX_CONTINUOUS)
-    if not ok:
-        raise RuntimeError("Failed to enter RX_CONTINUOUS mode.")
-
+    radio.start(RX_CONTINUOUS)
+    
     try:
         print("starting program running")
         await asyncio.Event().wait()

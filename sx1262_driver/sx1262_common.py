@@ -33,7 +33,7 @@ class SX1262Common:
 
         self.set_packet_type(LORA_MODEM)
         self._fix_resistance_antenna()
-        # self._start_recv_loop()
+        self._start_recv_loop()
         return True
 
     def end(self):
@@ -95,9 +95,10 @@ class SX1262Common:
         return status & 0x7E
     
     def start(self, rx_timeout, interval=0.01):
+        print(f"starting radio receive {rx_timeout} ms")
         ok = self.request(rx_timeout)
         if not ok:
             raise RuntimeError("Failed to enter RX mode.")
-        self._start_recv_loop(interval)
+        # self._start_recv_loop(interval)
         return True
     
