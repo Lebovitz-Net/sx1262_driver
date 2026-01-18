@@ -28,3 +28,4 @@ keys
 .DS_Store
 sx1262_driver.egg-info
 packet.txt
+backup
