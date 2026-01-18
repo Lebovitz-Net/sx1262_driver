@@ -95,8 +95,9 @@ class SX1262Interrupt:
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
-                    print(f"irq status is {hex(irq)} chip status is {hex(self.get_mode_and_status())}")
+                    print(f"irq status is {hex(irq)} chip status before is {hex(self.get_mode_and_status())}")
                     self._handle_irq(irq, None)
+                    print(f"hip status after is {hex(self.get_mode_and_status())}")
                 time.sleep(interval)
             self._recv_stopped = True
             print("recv loop stopped")
