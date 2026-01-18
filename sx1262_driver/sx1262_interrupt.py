@@ -143,6 +143,7 @@ class SX1262Interrupt:
         # RX done (single or continuous)
         if irq & IRQ_RX_DONE and not (irq & error_status):
             self._interrupt_rx(irq, _channel)
+            self.busy_check()
             self.set_rx(RX_CONTINUOUS)
 
         # Timeout
