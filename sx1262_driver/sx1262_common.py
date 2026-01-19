@@ -96,9 +96,9 @@ class SX1262Common:
     
     def start(self, rx_timeout, interval=0.01):
         print(f"starting radio receive {hex(rx_timeout)} ms")
+        self._start_recv_loop(interval)
         ok = self.request(rx_timeout)
         if not ok:
             raise RuntimeError("Failed to enter RX mode.")
-        self._start_recv_loop(interval)
         return True
     
