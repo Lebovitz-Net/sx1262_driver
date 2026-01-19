@@ -23,7 +23,8 @@ FREQUENCY_HZ = 910525000   # 910.525 MHz
 BANDWIDTH_HZ = 62500        # 62.5 kHz
 SPREADING_FACTOR = 7
 CODING_RATE = 5              # 4/5
-# PREAMBLE_LENGTH =8 
+RX_TYPE = RX_CONTINUOUS
+LORA_SYNC_WORD = LORA_SYNC_WORD_PRIVATE
 # PAYLOAD_LENGTH =256 
 # CRC_ENABLED = True
 # INVERT_IQ = False
@@ -185,7 +186,7 @@ async def main():
     # radio._start_recv_loop() -  moved to begin()
 
     # Sync word (public network)
-    radio.set_sync_word(LORA_SYNC_WORD_PUBLIC)
+    radio.set_sync_word(LORA_SYNC_WORD)
 
     # Frequency
     radio.set_frequency(FREQUENCY_HZ)
@@ -213,10 +214,11 @@ async def main():
     # Register callback
     # radio.on_receive(on_rx)
 
-    print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz…")
+    print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz, BW={BANDWIDTH_HZ} Hz, SF={SPREADING_FACTOR}, CR=4/{CODING_RATE}")
+    print(f"Sync word: {hex(LORA_SYNC_WORD)}, RX type: {hex(RX_TYPE)}")
     print("Waiting for packets…")
 
-    radio.start(RX_CONTINUOUS)
+    radio.start(RX_TYPE)
     
     try:
         print("starting program running")
