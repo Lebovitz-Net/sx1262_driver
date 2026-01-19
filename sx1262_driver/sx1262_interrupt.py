@@ -174,10 +174,12 @@ class SX1262Interrupt:
 
         if irq != 0:
             self.clear_irq_status(irq)
-            self.busy_check() # Clear IRQs at the end to release the latch
+            if (self.busy_check()):
+                print(".../handle_irq: busy_check after clear_irq_status detected busy state!")
 
         if self._status_wait == STATUS_RX_CONTINUOUS:
             self.set_rx(RX_CONTINUOUS)
-            self.busy_check()
+            if (self.busy_check()):
+                print(".../handle_irq: busy_check after set_rx detected busy state!")
 
         self._status_irq = 0x0000
