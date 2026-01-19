@@ -269,6 +269,8 @@ class SX1262Api:
 
     def get_rx_buffer_status(self) -> tuple:
         buf = self._read_bytes(0x13, 3)
+        self._payload_tx_rx = buf[1]
+        self._buffer_index = buf[2]
         return buf[1:3]
 
     def get_packet_status(self) -> tuple:

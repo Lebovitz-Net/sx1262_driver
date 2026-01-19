@@ -13,6 +13,9 @@ class SX1262Interrupt:
         self._recv_data = None
 
     # INTERRUPT HANDLER METHODS
+    # These are timing critical functions. Keep them lean.
+    # Print statements will affect the timing and may cause missed IRQs.
+    # Missed IRQs can lead to lockups in receive mode.
 
     def _irq_setup(self, irq_mask):
         self.clear_irq_status(IRQ_ALL)
@@ -53,10 +56,9 @@ class SX1262Interrupt:
         # if self._status_wait == STATUS_RX_CONTINUOUS:
         #     self.clear_irq_status(IRQ_ALL)
 
-        (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
+        (payload_length, _) = self.get_rx_buffer_status()
 
         data = None
-        payload_length = self._payload_tx_rx
 
         if payload_length > 0:
             data = self.get(payload_length)
@@ -135,6 +137,10 @@ class SX1262Interrupt:
             print(f".../handle_irq got spurious IRQ {hex(irq)}, mode is {hex(self.get_mode_and_control())}")
             return
 
+        #---------------------------------------------------------------------
+        # No errors: handle TX done, RX done, CAD events
+        #---------------------------------------------------------------------
+
         if ((irq & error_status) == 0):     # TX done
             if irq & IRQ_TX_DONE and ((irq & error_status) == 0):
                 self._interrupt_tx(irq, _channel)
@@ -149,6 +155,10 @@ class SX1262Interrupt:
 
             elif irq & IRQ_CAD_DONE:
                 self.emit("cad_done", irq_status=irq)
+
+        #---------------------------------------------------------------------
+        # Errors: timeout, header error, CRC error
+        #---------------------------------------------------------------------
 
         else:
             if irq & IRQ_TIMEOUT:

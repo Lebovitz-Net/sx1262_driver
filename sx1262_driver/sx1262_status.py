@@ -34,7 +34,7 @@ class SX1262Status:
                 gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
         elif self._status_wait == STATUS_RX_WAIT:
-            (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
+            self.get_rx_buffer_status() # sets self._payload_tx_rx and self._buffer_index
             if self._txen != -1:
                 from lgpio import gpio_write # type: ignore - pi only
 
@@ -42,7 +42,7 @@ class SX1262Status:
             self._fix_rx_timeout()
 
         elif self._status_wait == STATUS_RX_CONTINUOUS:
-            (self._payload_tx_rx, self._buffer_index) = self.get_rx_buffer_status()
+            self.get_rx_buffer_status() # sets self._payload_tx_rx and self._buffer_index
             self.clear_irq_status(IRQ_ALL)
 
         self._status_irq = irq_stat
