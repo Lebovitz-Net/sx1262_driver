@@ -58,7 +58,6 @@ class SX1262Interrupt:
         data = None
         payload_length = self._payload_tx_rx
 
-        print( f"payload length is {payload_length} buffer index is {self._buffer_index}" )
         if payload_length > 0:
             data = self.get(payload_length)
             
@@ -129,9 +128,6 @@ class SX1262Interrupt:
         """
         # Keep legacy status() path in sync
         self._status_irq = irq
-        if irq != 0:
-            self.clear_irq_status(irq)
-            self.busy_check()
 
         error_status = (IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT) & 0xFFFF
 
@@ -139,34 +135,36 @@ class SX1262Interrupt:
             print(f".../handle_irq got spurious IRQ {hex(irq)}, mode is {hex(self.get_mode_and_control())}")
             return
 
-        # TX done
-        if irq & IRQ_TX_DONE and ((irq & error_status) == 0):
-            self._interrupt_tx(irq, _channel)
+        if ((irq & error_status) == 0):     # TX done
+            if irq & IRQ_TX_DONE and ((irq & error_status) == 0):
+                self._interrupt_tx(irq, _channel)
 
-        # RX done (single or continuous)
-        if irq & IRQ_RX_DONE and ((irq & error_status) == 0):
-            self._interrupt_rx(irq, _channel)
+            # RX done (single or continuous)
+            elif irq & IRQ_RX_DONE and ((irq & error_status) == 0):
+                self._interrupt_rx(irq, _channel)
 
-        # Timeout
-        if irq & IRQ_TIMEOUT:
-            # Emit an explicit timeout event
-            self.emit("timeout", irq_status=irq)
-        # Header error
-        if irq & IRQ_HEADER_ERR:
-            self.emit("header_error", irq_status=irq)
+            # CAD events (if/when you use them)
+            elif irq & IRQ_CAD_DETECTED:
+                self.emit("cad_detected", irq_status=irq)
 
-        # CRC error
-        if irq & IRQ_CRC_ERR:
-            self.emit("crc_error", irq_status=irq)
+            elif irq & IRQ_CAD_DONE:
+                self.emit("cad_done", irq_status=irq)
 
-        # CAD events (if/when you use them)
-        if irq & IRQ_CAD_DETECTED:
-            self.emit("cad_detected", irq_status=irq)
+        else:
+            if irq & IRQ_TIMEOUT:
+                # Emit an explicit timeout event
+                self.emit("timeout", irq_status=irq)
+            # Header error
+            elif irq & IRQ_HEADER_ERR:
+                self.emit("header_error", irq_status=irq)
 
-        if irq & IRQ_CAD_DONE:
-            self.emit("cad_done", irq_status=irq)
+            # CRC error
+            elif irq & IRQ_CRC_ERR:
+                self.emit("crc_error", irq_status=irq)
 
-        # Clear IRQs at the end to release the latch
+        if irq != 0:
+            self.clear_irq_status(irq)
+            self.busy_check() # Clear IRQs at the end to release the latch
 
         if self._status_wait == STATUS_RX_CONTINUOUS:
             self.set_rx(RX_CONTINUOUS)
