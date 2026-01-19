@@ -130,6 +130,10 @@ class SX1262Interrupt:
         """
         # Keep legacy status() path in sync
         self._status_irq = irq
+        if irq != 0:
+            self.clear_irq_status(irq)
+            if (self.busy_check()):
+                print(".../handle_irq: busy_check after clear_irq_status detected busy state!")
 
         error_status = (IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT) & 0xFFFF
 
@@ -171,11 +175,6 @@ class SX1262Interrupt:
             # CRC error
             elif irq & IRQ_CRC_ERR:
                 self.emit("crc_error", irq_status=irq)
-
-        if irq != 0:
-            self.clear_irq_status(irq)
-            if (self.busy_check()):
-                print(".../handle_irq: busy_check after clear_irq_status detected busy state!")
 
         if self._status_wait == STATUS_RX_CONTINUOUS:
             self.set_rx(RX_CONTINUOUS)
