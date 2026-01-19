@@ -60,7 +60,7 @@ class SX1262Interrupt:
 
         print( f"payload length is {payload_length} buffer index is {self._buffer_index}" )
         if payload_length > 0:
-            data =  self.get(payload_length)
+            data = self.get(payload_length)
             
         self.emit(
             "rx_done",
@@ -95,7 +95,6 @@ class SX1262Interrupt:
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
-                    print(f"irq status is {hex(irq)} chip status before is {hex(self.get_mode_and_status())}")
                     self._handle_irq(irq, None)
                 time.sleep(interval)
             self._recv_stopped = True
@@ -130,8 +129,11 @@ class SX1262Interrupt:
         """
         # Keep legacy status() path in sync
         self._status_irq = irq
-        error_status = IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT
-        irq_mask = ~(error_status | IRQ_RX_DONE) & 0xFF
+        if irq != 0:
+            self.clear_irq_status(irq)
+            self.busy_check()
+
+        error_status = (IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT) & 0xFFFF
         print(f"handle_irq: irq={hex(irq)} mask={hex(irq_mask)}")
 
         if (irq & 0x2000):
@@ -139,37 +141,24 @@ class SX1262Interrupt:
             return
 
         # TX done
-        if irq & IRQ_TX_DONE and not (irq & error_status):
+        if irq & IRQ_TX_DONE and ((irq & error_status) == 0):
             self._interrupt_tx(irq, _channel)
 
         # RX done (single or continuous)
-        if irq & IRQ_RX_DONE and not (irq & error_status):
+        if irq & IRQ_RX_DONE and ((irq & error_status) == 0):
             self._interrupt_rx(irq, _channel)
-            self.clear_irq_status(IRQ_RX_DONE)
-            self.busy_check()
-            self.set_rx(RX_CONTINUOUS)
 
         # Timeout
         if irq & IRQ_TIMEOUT:
             # Emit an explicit timeout event
             self.emit("timeout", irq_status=irq)
-            self.clear_irq_status(IRQ_TIMEOUT)
-            self.busy_check()
-            self.set_rx(RX_CONTINUOUS)
-
         # Header error
         if irq & IRQ_HEADER_ERR:
             self.emit("header_error", irq_status=irq)
-            self.clear_irq_status(IRQ_HEADER_ERR)
-            self.busy_check()
-            self.set_rx(RX_CONTINUOUS)
 
         # CRC error
         if irq & IRQ_CRC_ERR:
             self.emit("crc_error", irq_status=irq)
-            self.clear_irq_status(IRQ_CRC_ERR)
-            self.busy_check()
-            self.set_rx(RX_CONTINUOUS)
 
         # CAD events (if/when you use them)
         if irq & IRQ_CAD_DETECTED:
@@ -179,9 +168,9 @@ class SX1262Interrupt:
             self.emit("cad_done", irq_status=irq)
 
         # Clear IRQs at the end to release the latch
-        self.busy_check()
 
-        if (irq & irq_mask) != 0:
-            self.clear_irq_status(irq & irq_mask)
+        if self._status_wait == STATUS_RX_CONTINUOUS:
+            self.set_rx(RX_CONTINUOUS)
             self.busy_check()
+
         self._status_irq = 0x0000
