@@ -134,7 +134,6 @@ class SX1262Interrupt:
             self.busy_check()
 
         error_status = (IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT) & 0xFFFF
-        print(f"handle_irq: irq={hex(irq)} mask={hex(irq_mask)}")
 
         if (irq & 0x2000):
             print(f".../handle_irq got spurious IRQ {hex(irq)}, mode is {hex(self.get_mode_and_control())}")
