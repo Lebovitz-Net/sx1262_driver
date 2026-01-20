@@ -97,12 +97,11 @@ class SX1262Interrupt:
                 irq = self.get_irq_status()
                 if irq:
                     self._handle_irq(irq, None)
-                    
+
                     self.clear_irq_status(irq)
-                    self.busy_check()
-                    if self._status_wait == STATUS_RX_CONTINUOUS:
-                        self.set_rx(RX_CONTINUOUS)
-                        self.busy_check()
+                    # if self._status_wait == STATUS_RX_CONTINUOUS:
+                    #     self.set_rx(RX_CONTINUOUS)
+
                 time.sleep(interval)
             self._recv_stopped = True
             print("recv loop stopped")
