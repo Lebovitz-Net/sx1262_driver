@@ -78,8 +78,8 @@ class SX1262Common:
         start = time.time()
         while lgpio.gpio_read(self.gpio_chip, self._busy) == 1:
             if (time.time() - start) > (timeout / 1000.0):
+                print(f"busy_check return ... {self._busy} == 1")
                 return True
-        print(f"busy_check return ... {self._busy} == 0")
         return False
 
     def set_fallback_mode(self, fallback_mode):
