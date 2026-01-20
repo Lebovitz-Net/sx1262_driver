@@ -73,6 +73,7 @@ class SX1262Common:
         self.set_standby(option)
 
     def busy_check(self, timeout: int = BUSY_TIMEOUT) -> bool:
+        print(f"busy_check... {self._busy}")
         start = time.time()
         while lgpio.gpio_read(self.gpio_chip, self._busy) == 1:
             if (time.time() - start) > (timeout / 1000.0):
