@@ -97,6 +97,12 @@ class SX1262Interrupt:
                 irq = self.get_irq_status()
                 if irq:
                     self._handle_irq(irq, None)
+                    
+                    self.clear_irq_status(irq)
+                    self.busy_check()
+                    if self._status_wait == STATUS_RX_CONTINUOUS:
+                        self.set_rx(RX_CONTINUOUS)
+                        self.busy_check()
                 time.sleep(interval)
             self._recv_stopped = True
             print("recv loop stopped")
@@ -130,10 +136,6 @@ class SX1262Interrupt:
         """
         # Keep legacy status() path in sync
         self._status_irq = irq
-        if irq != 0:
-            self.clear_irq_status(irq)
-            if (self.busy_check()):
-                print(".../handle_irq: busy_check after clear_irq_status detected busy state!")
 
         error_status = (IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT) & 0xFFFF
 
@@ -146,11 +148,11 @@ class SX1262Interrupt:
         #---------------------------------------------------------------------
 
         if ((irq & error_status) == 0):     # TX done
-            if irq & IRQ_TX_DONE and ((irq & error_status) == 0):
+            if irq & IRQ_TX_DONE:
                 self._interrupt_tx(irq, _channel)
 
             # RX done (single or continuous)
-            elif irq & IRQ_RX_DONE and ((irq & error_status) == 0):
+            elif irq & IRQ_RX_DONE:
                 self._interrupt_rx(irq, _channel)
 
             # CAD events (if/when you use them)
@@ -175,10 +177,5 @@ class SX1262Interrupt:
             # CRC error
             elif irq & IRQ_CRC_ERR:
                 self.emit("crc_error", irq_status=irq)
-
-        if self._status_wait == STATUS_RX_CONTINUOUS:
-            self.set_rx(RX_CONTINUOUS)
-            if (self.busy_check()):
-                print(".../handle_irq: busy_check after set_rx detected busy state!")
 
         self._status_irq = 0x0000
