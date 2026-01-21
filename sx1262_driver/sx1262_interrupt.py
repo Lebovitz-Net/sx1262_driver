@@ -93,18 +93,12 @@ class SX1262Interrupt:
         def loop():
             self._recv_running = True
             self._recv_stopped = False
-            start = time.time()
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
                     self._handle_irq(irq, None)  # handle IRQ STATUS, read FIFO if RX_DONE
                     self.clear_irq_status(0xFFFF)
-                    mode = self.get_mode_and_status()
-                    if mode != 0x52:
-                        print(f"irq loop mode: {hex(mode)}")
-                if (time.time() - start) > (10):
-                    print(f"tick {hex(self.get_mode_and_status())}")
-                    start =  time.time()
+                    time.sleep(0.1)  # allow time for processing
             self._recv_stopped = True
             print("recv loop stopped")
 
