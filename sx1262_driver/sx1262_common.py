@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from sx1262_constants import *
 
@@ -77,6 +78,7 @@ class SX1262Common:
         while lgpio.gpio_read(self.gpio_chip, self._busy) == 1:
             if (time.time() - start) > (timeout / 1000.0):
                 print(f"busy_check return ... {self._busy} == 1")
+                traceback.print_exc()
                 return True
         return False
 
