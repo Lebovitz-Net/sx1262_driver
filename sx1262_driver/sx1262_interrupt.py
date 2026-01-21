@@ -96,16 +96,10 @@ class SX1262Interrupt:
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
-                    self._handle_irq(irq, None)
-                    self.busy_check()
-                    self.clear_irq_status(irq)
-                    self.busy_check()
-                mode = self.get_mode()
-                if (mode != STATUS_MODE_RX):
-                    print(f"recv mode is {hex(mode)}")
-                    self.set_rx(RX_CONTINUOUS)
+                    self._handle_irq(irq, None)  # handle IRQ STATUS, read FIFO if RX_DONE
+                    self.clear_irq_status(IRQ_ALL)
 
-                time.sleep(interval)
+                # time.sleep(interval)
             self._recv_stopped = True
             print("recv loop stopped")
 
@@ -140,10 +134,6 @@ class SX1262Interrupt:
         self._status_irq = irq
 
         error_status = (IRQ_HEADER_ERR | IRQ_CRC_ERR | IRQ_TIMEOUT) & 0xFFFF
-
-        if (irq & 0x2000):
-            print(f".../handle_irq got spurious IRQ {hex(irq)}, mode is {hex(self.get_mode_and_control())}")
-            return
 
         #---------------------------------------------------------------------
         # No errors: handle TX done, RX done, CAD events
