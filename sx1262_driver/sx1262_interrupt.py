@@ -96,8 +96,8 @@ class SX1262Interrupt:
             while self._recv_running:
                 irq = self.get_irq_status()
                 if irq:
-                    self._handle_irq(irq, None)  # handle IRQ STATUS, read FIFO if RX_DONE
                     self.clear_irq_status(IRQ_ALL)
+                    self._handle_irq(irq, None)  # handle IRQ STATUS, read FIFO if RX_DONE
 
                 # time.sleep(interval)
             self._recv_stopped = True
