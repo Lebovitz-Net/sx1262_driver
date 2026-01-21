@@ -98,7 +98,7 @@ class SX1262Interrupt:
                 if irq:
                     self._handle_irq(irq, None)  # handle IRQ STATUS, read FIFO if RX_DONE
                     self.clear_irq_status(IRQ_ALL)
-                    time.sleep(0.3)  # allow time for processing
+                    time.sleep(0.0003)  # allow time for processing
             self._recv_stopped = True
             print("recv loop stopped")
 
