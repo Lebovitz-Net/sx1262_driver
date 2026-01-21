@@ -102,7 +102,7 @@ class SX1262Interrupt:
                 # time.sleep(interval)
             if (time.time() - start) > (5):
                 print(f"tick")
-                start =  time.time()
+                start =  time.time() 
             self._recv_stopped = True
             print("recv loop stopped")
 
