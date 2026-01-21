@@ -83,7 +83,7 @@ class SX1262Interrupt:
     # Internal IRQ polling loop -> emits events via SX1262Interrupt._handle_irq
     # -------------------------------------------------------------------------
 
-    def _start_recv_loop (self, interval=0.01):
+    def _start_recv_loop (self, interval=0.005):
 
         if self._recv_thread and self._recv_running:
             return
@@ -100,8 +100,10 @@ class SX1262Interrupt:
                     self.busy_check()
                     self.clear_irq_status(irq)
                     self.busy_check()
-                    if self._status_wait == STATUS_RX_CONTINUOUS:
-                        self.set_rx(RX_CONTINUOUS)
+                    mode = self.get_mode()
+                    if (mode != STATUS_MODE_RX):
+                       print(f"recv mode is {hex(mode)}")
+                       self.set_rx(RX_CONTINUOUS)
 
                 time.sleep(interval)
             self._recv_stopped = True
