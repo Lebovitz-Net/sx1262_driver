@@ -99,8 +99,9 @@ class SX1262Interrupt:
                     self._handle_irq(irq, None)
                     self.busy_check()
                     self.clear_irq_status(irq)
-                    # if self._status_wait == STATUS_RX_CONTINUOUS:
-                    #     self.set_rx(RX_CONTINUOUS)
+                    self.busy_check()
+                    if self._status_wait == STATUS_RX_CONTINUOUS:
+                        self.set_rx(RX_CONTINUOUS)
 
                 time.sleep(interval)
             self._recv_stopped = True
