@@ -142,11 +142,13 @@ async def main():
     # radio.on_receive(on_rx)
 
     print(f"Starting continuous receive at {FREQUENCY_HZ/1e6:.6f} MHz, BW={BANDWIDTH_HZ} Hz, SF={SPREADING_FACTOR}, CR=4/{CODING_RATE}")
-    print(f"Sync word: {hex(LORA_SYNC_WORD)}, RX timeout: {hex(RX_TIMEOUT)}")
+    print(f"Sync word: {hex(LORA_SYNC_WORD_PRIVATE)}, RX timeout: {hex(RX_TIMEOUT)}")
     print("Waiting for packets…")
 
-    radio.start(RX_TIMEOUT)
-    
+    radio.request(RX_TIMEOUT)
+    if not ok:
+        raise RuntimeError("Failed to enter RX mode.")
+
     try:
         print("starting program running")
         await asyncio.Event().wait()
