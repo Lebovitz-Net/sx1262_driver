@@ -101,7 +101,7 @@ class SX1262Interrupt:
                     self.clear_irq_status(IRQ_ALL)
                 # time.sleep(interval)
                 if (time.time() - start) > (10):
-                    print(f"tick {hex(self.get_mode())}")
+                    print(f"tick {hex(self.get_mode_and_status())}")
                     start =  time.time()
             self._recv_stopped = True
             print("recv loop stopped")
