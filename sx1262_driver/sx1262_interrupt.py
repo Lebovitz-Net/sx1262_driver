@@ -100,10 +100,10 @@ class SX1262Interrupt:
                     self.busy_check()
                     self.clear_irq_status(irq)
                     self.busy_check()
-                    mode = self.get_mode()
-                    if (mode != STATUS_MODE_RX):
-                       print(f"recv mode is {hex(mode)}")
-                       self.set_rx(RX_CONTINUOUS)
+                mode = self.get_mode()
+                if (mode != STATUS_MODE_RX):
+                    print(f"recv mode is {hex(mode)}")
+                    self.set_rx(RX_CONTINUOUS)
 
                 time.sleep(interval)
             self._recv_stopped = True
