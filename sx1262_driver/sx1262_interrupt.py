@@ -99,7 +99,9 @@ class SX1262Interrupt:
                 if irq:
                     self._handle_irq(irq, None)  # handle IRQ STATUS, read FIFO if RX_DONE
                     self.clear_irq_status(IRQ_ALL)
-                # time.sleep(interval)
+                    mode = self.get_mode_and_status()
+                    if mode != 0x52:
+                        print(f"irq loop mode: {hex(mode)}")
                 if (time.time() - start) > (10):
                     print(f"tick {hex(self.get_mode_and_status())}")
                     start =  time.time()
