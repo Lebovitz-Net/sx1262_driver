@@ -158,7 +158,9 @@ class SX1262Interrupt:
         #---------------------------------------------------------------------
 
         else:
-            if irq & IRQ_TIMEOUT:
+            if (irq > 0x3FF):
+                pass
+            elif irq & IRQ_TIMEOUT:
                 # Emit an explicit timeout event
                 self.emit("timeout", irq_status=irq)
             # Header error
