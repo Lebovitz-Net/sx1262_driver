@@ -57,13 +57,17 @@ _recv_thread = None
 _recv_running = False
 
 def handle_header_error(irq_status):
-    print(f"Header error event: irq_status={hex(irq_status)}")
+    rssi = radio.packet_rssi()
+    snr = radio.snr()
+    print(f"Header error event: irq_status={hex(irq_status)}, RSSI={rssi:.1f} dBm, SNR={snr:.1f} dB")
 
 def handle_timeout(irq_status):
     print(f"Timeout event: irq_status={hex(irq_status)}")
 
 def handle_crc_error(irq_status):
-    print(f"CRC error event: irq_status={hex(irq_status)}")
+    rssi = radio.packet_rssi()
+    snr = radio.snr()
+    print(f"CRC error event: irq_status={hex(irq_status)}, RSSI={rssi:.1f} dBm, SNR={snr:.1f} dB")
 
 def handle_rx_done(data, payload_length, irq_status):
     # data = radio.get(payload_length)
