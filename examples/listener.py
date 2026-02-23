@@ -29,15 +29,18 @@ LORA_SYNC_WORD = LORA_SYNC_WORD_PRIVATE
 # CRC_ENABLED = True
 # INVERT_IQ = False
 
+_recv_thread = None
+_recv_running = False
 
 def start_background_rssi(driver, interval=5):
     """
     driver.rssi_inst() returns instantaneous RSSI in dBm.
     Runs forever in a daemon thread.
     """
-
     def loop():
-        while True:
+        global _recv_running
+        _recv_running = True
+        while _recv_running:
             try:
                 rssi = driver.rssi_inst()
                 print("RSSI:", rssi)
@@ -52,9 +55,6 @@ def start_background_rssi(driver, interval=5):
 
     t = threading.Thread(target=loop, daemon=True)
     t.start()
-
-_recv_thread = None
-_recv_running = False
 
 def handle_header_error(irq_status):
     rssi = radio.packet_rssi()
@@ -84,6 +84,7 @@ def handle_rx_done(data, payload_length, irq_status):
 
 async def main():
     global radio
+    global _recv_running
 
     print("Initializing SX1262…")
 
@@ -160,6 +161,7 @@ async def main():
         # This ALWAYS runs, even on Ctrl+C
         print("Shutting down…")
         # radio._stop_recv_loop()
+        _recv_running = False
         radio.end() 
 
 if __name__ == "__main__":
