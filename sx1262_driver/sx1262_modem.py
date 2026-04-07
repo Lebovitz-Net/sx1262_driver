@@ -1,6 +1,6 @@
 import time
 
-from sx1262_constants import *
+from .sx1262_constants import *
 
 class SX1262Modem:
     def __init__(self):

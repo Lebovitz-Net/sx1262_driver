@@ -1,7 +1,7 @@
 import time
 import threading
 
-from sx1262_constants import *
+from .sx1262_constants import *
 
 class SX1262Interrupt:
     def __init__(self):

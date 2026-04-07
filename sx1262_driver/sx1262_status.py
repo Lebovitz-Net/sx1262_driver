@@ -1,6 +1,6 @@
 import time
 import lgpio # type: ignore - pi only
-from sx1262_constants import *
+from .sx1262_constants import *
 
 class SX1262Status:
     def __init__(self):

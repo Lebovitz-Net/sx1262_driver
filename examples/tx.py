@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import time
-from sx1262 import SX1262
-from sx1262_constants import *
+from sx1262_driver.sx1262 import SX1262
+from sx1262_driver.sx1262_constants import *
 
 FREQ = 868_300_000
 

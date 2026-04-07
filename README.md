@@ -62,12 +62,18 @@ pip install dist/sx1262_driver-*.tar.gz
 python3
 from sx1262_driver import SX1262
 radio = SX1262()
-
-3## Run the examples
+## Run the examples
 python3 examples/listener.py
 python3 examples/tx.py
 
 #### these import the installed Package
 from sx1262_driver import SX1262
+
+## Install directly from GitHub
+You can also install the package directly from this repository (useful for CI or testing):
+
+```bash
+pip install git+https://github.com/Lebovitz-Net/sx1262_driver.git
+```
 
 

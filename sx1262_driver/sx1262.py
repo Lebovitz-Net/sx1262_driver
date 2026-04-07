@@ -3,15 +3,15 @@ import lgpio # type: ignore - pi only
 import time
 
 from event_emitter import EventEmitter
-from sx1262_vars import SX1262Vars
-from sx1262_api import SX1262Api
-from sx1262_common import SX1262Common
-from sx1262_hardware import SX1262Hardware
-from sx1262_modem import SX1262Modem
-from sx1262_receive import SX1262Receive
-from sx1262_transmit import SX1262Transmit
-from sx1262_status import SX1262Status
-from sx1262_interrupt import SX1262Interrupt
+from .sx1262_vars import SX1262Vars
+from .sx1262_api import SX1262Api
+from .sx1262_common import SX1262Common
+from .sx1262_hardware import SX1262Hardware
+from .sx1262_modem import SX1262Modem
+from .sx1262_receive import SX1262Receive
+from .sx1262_transmit import SX1262Transmit
+from .sx1262_status import SX1262Status
+from .sx1262_interrupt import SX1262Interrupt
 
 
 class SX1262(

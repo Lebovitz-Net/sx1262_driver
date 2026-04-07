@@ -1,5 +1,5 @@
 import lgpio # type: ignore - pi only
-from sx1262_constants import *
+from .sx1262_constants import *
 
 
 class SX1262Api:

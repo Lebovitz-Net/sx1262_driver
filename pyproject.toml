@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "sx1262_driver"
 version = "0.1.0"
 description = "Event-driven SX1262 LoRa driver for Raspberry Pi using lgpio"
-readme = "README.md"
+readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
@@ -19,5 +19,17 @@ dependencies = [
   "spidev",
 ]
 
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+]
+keywords = ["sx1262","lora","lgpio","lorawan"]
+
 [project.urls]
 Homepage = "https://github.com/yourname/sx1262-driver"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sx1262_driver*"]
