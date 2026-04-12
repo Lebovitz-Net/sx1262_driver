@@ -3,7 +3,8 @@
 # Pure Python (no external libraries). Uses your local SX126x.py driver.
 
 import time, struct, json, secrets
-from SX126x import SX126x
+from sx1262_driver.sx1262 import SX1262 as SX126x
+from sx1262_driver.sx1262_constants import *
 
 # ------------------- USER SETTINGS -------------------
 # Copy from TTN device (OTAA)
