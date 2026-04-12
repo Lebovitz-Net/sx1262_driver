@@ -95,8 +95,6 @@ class SX1262Receive:
         return bytes(buf)
 
     def purge(self, length: int = 0):
-        if self._buffer_index > length:
-            self._payload_tx_rx = self._payload_tx_rx - length
-        else:
-            self._payload_tx_rx = 0
-        self._buffer_index += self._payload_tx_rx
+        skip = min(length, self._payload_tx_rx)
+        self._payload_tx_rx -= skip
+        self._buffer_index = (self._buffer_index + skip) % 256
