@@ -1,0 +1,290 @@
+"""
+Reticulum Interface for SX1262 LoRa Transceiver
+
+This module implements a Reticulum-compatible interface for the SX1262 LoRa radio,
+enabling mesh networking capabilities using the sx1262_driver module.
+
+Configuration example (in ~/.reticulum/config):
+
+    [[SX1262 LoRa Interface]]
+      type = SX1262ReticulumInterface
+      enabled = yes
+      name = sx1262_lora
+      
+      # Radio Parameters
+      frequency = 910525000
+      bandwidth = 62500
+      spreading_factor = 7
+      coding_rate = 5
+      sync_word = 0x1424
+      
+      # GPIO/SPI Configuration (BCM numbering)
+      spi_bus = 0
+      spi_device = 0
+      reset_pin = 18
+      busy_pin = 20
+      irq_pin = -1
+      nss_pin = 21
+"""
+
+import time
+import threading
+import logging
+
+import RNS
+from RNS.Interfaces.Interface import Interface
+
+from .sx1262 import SX1262
+from .sx1262_constants import (
+    LORA_SYNC_WORD_PUBLIC,
+    LORA_SYNC_WORD_PRIVATE,
+    RX_CONTINUOUS,
+    HEADER_EXPLICIT,
+    PREAMBLE_LENGTH,
+    PAYLOAD_LENGTH,
+    CRC_ON,
+    IQ_STANDARD,
+    RX_GAIN_BOOSTED,
+)
+
+
+class SX1262ReticulumInterface(Interface):
+    """
+    Reticulum interface for SX1262 LoRa transceiver.
+    
+    Implements bidirectional packet exchange between Reticulum and the SX1262 radio,
+    with full support for LoRa modulation parameters and error handling.
+    """
+    
+    DEFAULT_IFAC_SIZE = 8
+    HW_MTU = 564
+    BITRATE_GUESS = 62500  # LoRa bitrate estimate
+    
+    def __init__(self, owner, configuration):
+        """
+        Initialize the SX1262 Reticulum interface.
+        
+        Args:
+            owner: The Reticulum transport instance
+            configuration: Configuration object from Reticulum config file
+        """
+        super().__init__()
+        
+        self.logger = RNS.log
+        self.owner = owner
+        self.online = False
+        self.radio = None
+        
+        # Parse configuration
+        try:
+            c = Interface.get_config_obj(configuration)
+            
+            # Interface name
+            self.name = c.get("name", "SX1262Interface")
+            
+            # Radio parameters
+            self.frequency = int(c.get("frequency", "910525000"))
+            self.bandwidth = int(c.get("bandwidth", "62500"))
+            self.spreading_factor = int(c.get("spreading_factor", "7"))
+            self.coding_rate = int(c.get("coding_rate", "5"))
+            
+            # Sync word handling
+            sync_word_str = c.get("sync_word", "0x1424")
+            if sync_word_str.startswith("0x"):
+                self.sync_word = int(sync_word_str, 16)
+            elif sync_word_str == "PUBLIC":
+                self.sync_word = LORA_SYNC_WORD_PUBLIC
+            elif sync_word_str == "PRIVATE":
+                self.sync_word = LORA_SYNC_WORD_PRIVATE
+            else:
+                self.sync_word = int(sync_word_str)
+            
+            # SPI configuration
+            self.spi_bus = int(c.get("spi_bus", "0"))
+            self.spi_device = int(c.get("spi_device", "0"))
+            
+            # GPIO pins (BCM numbering)
+            self.reset_pin = int(c.get("reset_pin", "18"))
+            self.busy_pin = int(c.get("busy_pin", "20"))
+            self.irq_pin = int(c.get("irq_pin", "-1"))
+            self.nss_pin = int(c.get("nss_pin", "21"))
+            
+        except Exception as e:
+            self.logger(f"SX1262 Interface: Configuration error: {e}", RNS.LOG_ERROR)
+            raise e
+        
+        # Initialize radio
+        try:
+            self.logger(f"SX1262 Interface: Initializing radio on SPI bus {self.spi_bus}, device {self.spi_device}")
+            self._init_radio()
+        except Exception as e:
+            self.logger(f"SX1262 Interface: Failed to initialize radio: {e}", RNS.LOG_ERROR)
+            raise e
+        
+        # Start receive thread
+        self.read_thread = None
+        self._should_run = True
+        self._start_read_thread()
+        
+        self.logger(f"SX1262 Interface: {self.name} initialized successfully", RNS.LOG_INFO)
+    
+    def _init_radio(self):
+        """Initialize and configure the SX1262 radio."""
+        self.radio = SX1262()
+        
+        # Begin radio operation
+        ok = self.radio.begin(
+            bus=self.spi_bus,
+            cs=self.spi_device,
+            reset=self.reset_pin,
+            busy=self.busy_pin,
+            irq=self.irq_pin,
+            txen=-1,
+            rxen=-1,
+            wake=-1,
+        )
+        
+        if not ok:
+            raise RuntimeError("SX1262 failed to enter STDBY_RC. Check BUSY, RESET, NSS wiring.")
+        
+        # Register event handlers
+        self.radio.on("rx_done", self._handle_rx_done)
+        self.radio.on("rx_error", self._handle_rx_error)
+        self.radio.on("timeout", self._handle_timeout)
+        
+        # Configure radio parameters
+        self.radio.set_sync_word(self.sync_word)
+        self.radio.set_frequency(self.frequency)
+        
+        self.radio.set_lora_modulation(
+            sf=self.spreading_factor,
+            bw=self.bandwidth,
+            cr=self.coding_rate,
+            ldro=False,
+        )
+        
+        self.radio.set_lora_packet(
+            header_type=HEADER_EXPLICIT,
+            preamble_length=PREAMBLE_LENGTH,
+            payload_length=PAYLOAD_LENGTH,
+            crc_type=CRC_ON,
+            invert_iq=IQ_STANDARD
+        )
+        
+        self.radio.set_rx_gain(RX_GAIN_BOOSTED)
+        
+        # Start continuous receive
+        self.radio.request(RX_CONTINUOUS)
+        self.online = True
+        
+        self.logger(
+            f"SX1262 Interface: Radio configured - "
+            f"Freq={self.frequency/1e6:.3f}MHz, "
+            f"SF={self.spreading_factor}, "
+            f"BW={self.bandwidth}, "
+            f"CR=4/{self.coding_rate}, "
+            f"SyncWord=0x{self.sync_word:04x}",
+            RNS.LOG_INFO
+        )
+    
+    def _handle_rx_done(self, data, payload_length, irq_status):
+        """
+        Handle received packet from radio.
+        
+        Called when a complete LoRa packet is received with valid CRC.
+        """
+        try:
+            self.logger(
+                f"SX1262 Interface: RX_DONE - {payload_length} bytes, "
+                f"RSSI={self.radio.packet_rssi():.1f}dBm, "
+                f"SNR={self.radio.snr():.1f}dB",
+                RNS.LOG_DEBUG
+            )
+            self.process_incoming(data)
+        except Exception as e:
+            self.logger(f"SX1262 Interface: RX_DONE handler error: {e}", RNS.LOG_ERROR)
+    
+    def _handle_rx_error(self, irq_status):
+        """Handle RX errors (CRC, header errors)."""
+        self.logger(
+            f"SX1262 Interface: RX error - "
+            f"RSSI={self.radio.packet_rssi():.1f}dBm, "
+            f"SNR={self.radio.snr():.1f}dB",
+            RNS.LOG_DEBUG
+        )
+    
+    def _handle_timeout(self, irq_status):
+        """Handle RX timeout (no packet received in expected time)."""
+        self.logger("SX1262 Interface: RX timeout", RNS.LOG_DEBUG)
+    
+    def _start_read_thread(self):
+        """Start background thread for radio event polling."""
+        self.read_thread = threading.Thread(target=self._read_loop, daemon=True)
+        self.read_thread.start()
+    
+    def _read_loop(self):
+        """
+        Background thread that monitors radio state.
+        
+        The actual packet reception is handled asynchronously via event callbacks.
+        This thread mainly keeps the radio alive and handles reconnection if needed.
+        """
+        try:
+            while self._should_run and self.online:
+                time.sleep(0.5)
+        except Exception as e:
+            self.logger(f"SX1262 Interface: Read loop error: {e}", RNS.LOG_ERROR)
+            self.online = False
+    
+    def process_incoming(self, data):
+        """
+        Process received packet and pass to Reticulum.
+        
+        Args:
+            data: Raw packet bytes from radio
+        """
+        if self.online:
+            self.rxb += len(data)
+            self.owner.inbound(data, self)
+    
+    def process_outgoing(self, data):
+        """
+        Send packet via radio.
+        
+        Args:
+            data: Packet bytes to transmit
+        """
+        if self.online and self.radio:
+            try:
+                # Set TX mode and transmit
+                self.radio.transmit(data)
+                self.txb += len(data)
+                self.logger(f"SX1262 Interface: TX - {len(data)} bytes", RNS.LOG_DEBUG)
+            except Exception as e:
+                self.logger(f"SX1262 Interface: TX error: {e}", RNS.LOG_ERROR)
+                raise e
+    
+    def should_ingress_limit(self):
+        """
+        Indicate whether ingress limiting should be applied.
+        
+        Returns:
+            False - LoRa is already rate-limited by modulation parameters
+        """
+        return False
+    
+    def detach(self):
+        """Clean up and shut down the interface."""
+        self.logger(f"SX1262 Interface: Detaching {self.name}", RNS.LOG_INFO)
+        self.online = False
+        self._should_run = False
+        
+        if self.radio:
+            try:
+                self.radio.end()
+            except Exception as e:
+                self.logger(f"SX1262 Interface: Error shutting down radio: {e}", RNS.LOG_WARNING)
+    
+    def __str__(self):
+        """String representation for logging."""
+        return f"SX1262ReticulumInterface[{self.name}]"
