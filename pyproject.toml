@@ -22,7 +22,6 @@ dependencies = [
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: POSIX :: Linux",
 ]
 keywords = ["sx1262","lora","lgpio","lorawan"]
