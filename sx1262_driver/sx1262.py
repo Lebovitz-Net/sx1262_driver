@@ -2,7 +2,7 @@ import spidev # type: ignore - pi only
 import lgpio # type: ignore - pi only
 import time
 
-from event_emitter import EventEmitter
+from .event_emitter import EventEmitter
 from .sx1262_vars import SX1262Vars
 from .sx1262_api import SX1262Api
 from .sx1262_common import SX1262Common
