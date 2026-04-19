@@ -66,7 +66,8 @@ def main():
         description=(
             "Broadcast a fixed GPS coordinate as Reticulum/LXMF telemetry "
             "compatible with Sideband and meshmap.reticulum.network"
-        )
+        ),
+        fromfile_prefix_chars="@",
     )
     parser.add_argument(
         "--lat", type=float, required=True,
@@ -96,7 +97,30 @@ def main():
         "--interval", type=int, default=300,
         help="Seconds between telemetry transmissions (default: 300)"
     )
-    args = parser.parse_args()
+    parser.add_argument(
+        "--config", type=str, default=None,
+        help="Path to a config file (default: ~/.reticulum/telemetry_beacon.conf if it exists)"
+    )
+
+    # If --config is explicitly given, inject it as @file before other args.
+    # Otherwise silently load the default config if it exists.
+    argv = sys.argv[1:]
+    default_conf = os.path.expanduser("~/.reticulum/telemetry_beacon.conf")
+    if not any(a.startswith("--config") for a in argv):
+        if os.path.isfile(default_conf):
+            argv = [f"@{default_conf}"] + argv
+    else:
+        # Replace --config <path> with @<path> so fromfile_prefix_chars handles it.
+        for i, a in enumerate(argv):
+            if a == "--config" and i + 1 < len(argv):
+                argv = [f"@{argv[i+1]}"] + argv[:i] + argv[i+2:]
+                break
+            if a.startswith("--config="):
+                path = a.split("=", 1)[1]
+                argv = [f"@{path}"] + argv[:i] + argv[i+1:]
+                break
+
+    args = parser.parse_args(argv)
 
     rns_configdir = os.path.expanduser("~/.reticulum")
     identity_path = os.path.join(rns_configdir, IDENTITY_FILENAME)

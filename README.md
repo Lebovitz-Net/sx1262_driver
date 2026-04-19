@@ -181,7 +181,24 @@ sx1262-telemetry-beacon \
   --interval  300
 ```
 
-Without `--collector` the beacon still announces itself on the Reticulum network (useful for testing), but it will not appear on meshmap.
+Or store the settings in `~/.reticulum/telemetry_beacon.conf` (loaded automatically):
+
+```
+--lat
+37.7749
+--lon
+-122.4194
+--alt
+50
+--name
+MyPi
+--collector
+<32-hex-char-hash>
+--interval
+300
+```
+
+Then just run `sx1262-telemetry-beacon` with no arguments.
 
 The beacon connects to the existing `rnsd` shared instance automatically, so `rnsd.service` must be running first.
 
