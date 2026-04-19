@@ -14,9 +14,9 @@ Configuration example (in ~/.reticulum/config):
       name = sx1262_lora
       
       # Radio Parameters
-      frequency = 910525000
-      bandwidth = 62500
-      spreading_factor = 7
+      frequency = 914875000
+      bandwidth = 125000
+      spreading_factor = 9
       coding_rate = 5
       sync_word = 0x1424
       preamble_length = 18
@@ -91,9 +91,9 @@ class SX1262ReticulumInterface(Interface):
             self.name = c.get("name", "SX1262Interface")
             
             # Radio parameters
-            self.frequency = int(c.get("frequency", "910525000"))
-            self.bandwidth = int(c.get("bandwidth", "62500"))
-            self.spreading_factor = int(c.get("spreading_factor", "7"))
+            self.frequency = int(c.get("frequency", "914875000"))
+            self.bandwidth = int(c.get("bandwidth", "125000"))
+            self.spreading_factor = int(c.get("spreading_factor", "9"))
             self.coding_rate = int(c.get("coding_rate", "5"))
             
             # LDRO handling: auto-calculate for SF11/SF12 and narrow bandwidths
