@@ -155,8 +155,47 @@ The venv binary has a shebang pointing to the venv Python, so all venv packages 
 
 ## Mesh map visibility
 
-[meshmap.reticulum.network](https://meshmap.reticulum.network) shows nodes that broadcast LXMF telemetry with a fixed location. This requires the [Sideband](https://github.com/markqvist/Sideband) application, which is designed for desktop/mobile use. `sbapp` is not practically installable on a headless Raspberry Pi (it pulls in Kivy/Android UI dependencies that require a Rust toolchain to build).
+[meshmap.reticulum.network](https://meshmap.reticulum.network) displays nodes that send LXMF telemetry with a fixed location. The `sx1262-telemetry-beacon` console script handles this without Sideband.
 
-If mesh map visibility is important, run Sideband on a separate desktop or laptop that is connected to the same Reticulum network via the TCP backbone.
+### Install
+
+```bash
+pip install "sx1262_driver[reticulum]"
+```
+
+This adds `lxmf` to the dependencies along with `rns`.
+
+### Find a collector hash
+
+The meshmap collector address changes periodically. The easiest way to find the current one is to open Sideband on any device, go to **Settings → Telemetry**, enable telemetry, and copy the collector hash shown there. You can also browse the meshmap site for the current collector announcement.
+
+### Run manually
+
+```bash
+sx1262-telemetry-beacon \
+  --lat   37.7749 \
+  --lon  -122.4194 \
+  --alt   50 \
+  --name  "MyPi" \
+  --collector <32-hex-char-hash> \
+  --interval  300
+```
+
+Without `--collector` the beacon still announces itself on the Reticulum network (useful for testing), but it will not appear on meshmap.
+
+The beacon connects to the existing `rnsd` shared instance automatically, so `rnsd.service` must be running first.
+
+### Run as a systemd service
+
+Copy and edit the example unit file:
+
+```bash
+cp examples/telemetry_beacon.service /etc/systemd/system/
+# edit /etc/systemd/system/telemetry_beacon.service — set coordinates, name, collector
+sudo systemctl daemon-reload
+sudo systemctl enable --now telemetry_beacon.service
+```
+
+The unit depends on `rnsd.service` and starts after it.
 
 

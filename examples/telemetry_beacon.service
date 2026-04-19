@@ -1,0 +1,24 @@
+[Unit]
+Description=Reticulum Telemetry Beacon
+After=network.target rnsd.service
+Requires=rnsd.service
+
+[Service]
+Type=simple
+User=gregg
+# Edit the coordinates, name, collector, and interval below.
+# To find a collector hash for meshmap.reticulum.network, connect
+# with Sideband on any device and check the telemetry collector
+# address under Settings → Telemetry.
+ExecStart=/home/gregg/.venv/bin/sx1262-telemetry-beacon \
+    --lat   37.7749 \
+    --lon  -122.4194 \
+    --alt   50 \
+    --name  "MyPi" \
+    --collector REPLACE_WITH_COLLECTOR_HASH \
+    --interval  300
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
