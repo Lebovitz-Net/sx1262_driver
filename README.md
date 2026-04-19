@@ -80,34 +80,60 @@ pip install git+https://github.com/Lebovitz-Net/sx1262_driver.git
 The package includes an optional Reticulum interface implementation in `sx1262_driver.reticulum_interface`.
 
 ### Install with Reticulum support
-If you want the Reticulum integration and its Python dependency, install the optional `reticulum` extra:
+
+Install the package with the optional `reticulum` extra, which pulls in the `rns` dependency:
 
 ```bash
 pip install "sx1262_driver[reticulum]"
 ```
 
-When installing directly from this repository, use:
+To install directly from GitHub:
 
 ```bash
 pip install "git+https://github.com/Lebovitz-Net/sx1262_driver.git#egg=sx1262_driver[reticulum]"
 ```
 
-If you build a wheel or source distribution locally, you can also install the extra from the project root:
+To install from a local clone (editable, useful during development):
 
 ```bash
-pip install ".[reticulum]"
+pip install -e ".[reticulum]"
 ```
 
-### Reticulum configuration
-An example Reticulum configuration is provided in `examples/reticulum_config_example.ini`.
+### Set up the Reticulum interface
 
-Copy the relevant interface block into `~/.reticulum/config` on the Raspberry Pi and adjust the radio parameters and GPIO pin assignments for your hardware.
+After installation, run the provided console script to:
 
-The Reticulum interface supports both polling mode and optional DIO1 IRQ handling:
+1. Install the interface loader file into `~/.reticulum/interfaces/`
+2. Create a starter `~/.reticulum/config` (skipped if the file already exists)
 
-- Set `irq_pin = -1` to keep using polling mode
-- Set `irq_pin` to your DIO1 BCM pin and `use_irq = true` to enable interrupt-driven receive handling
+```bash
+sx1262-install-rns-interface
+```
 
-The interface type name for Reticulum configuration is `SX1262ReticulumInterface`.
+The generated config includes a TCP backbone entry (`rns.noderage.org:4242`) and a pre-filled `[[SX1262 LoRa Interface]]` section with default mesh parameters:
+
+| Parameter | Default | Notes |
+|---|---|---|
+| Frequency | 914.875 MHz | North American LoRa mesh |
+| Bandwidth | 125 kHz | |
+| Spreading Factor | SF9 | |
+| Coding Rate | 4/5 | |
+| Sync Word | 0x1424 | Reticulum standard |
+| Preamble | 18 symbols | Minimum for RNode compatibility |
+
+Adjust the GPIO pin assignments (`reset_pin`, `busy_pin`, `nss_pin`) in `~/.reticulum/config` for your specific wiring.
+
+### Start Reticulum
+
+```bash
+rnsd
+```
+
+Reticulum will load the SX1262 interface automatically from the config file.
+
+### IRQ vs polling mode
+
+- `irq_pin = -1` and `use_irq = false` (default): polling mode, no IRQ wiring required
+- Set `irq_pin` to your DIO1 BCM pin and `use_irq = true` to enable interrupt-driven receive
 
 
