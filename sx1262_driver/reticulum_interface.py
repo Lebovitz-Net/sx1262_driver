@@ -381,7 +381,12 @@ class SX1262ReticulumInterface(Interface):
         if self.online and self.radio:
             try:
                 self._wait_for_idle()
-                self.radio.transmit(data)
+                self.radio.send_packet(
+                    data,
+                    tx_header_type=HEADER_EXPLICIT,
+                    tx_crc_type=CRC_ON,
+                    tx_invert_iq=IQ_STANDARD,
+                )
                 self.txb += len(data)
                 self.logger(f"SX1262 Interface: TX - {len(data)} bytes", RNS.LOG_DEBUG)
             except Exception as e:
