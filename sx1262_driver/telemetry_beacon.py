@@ -62,7 +62,14 @@ def make_icon_appearance():
 
 
 def main():
-    parser = argparse.ArgumentParser(
+    class ArgumentParser(argparse.ArgumentParser):
+        def convert_arg_line_to_args(self, line):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                return []
+            return [line]
+
+    parser = ArgumentParser(
         description=(
             "Broadcast a fixed GPS coordinate as Reticulum/LXMF telemetry "
             "compatible with Sideband and meshmap.reticulum.network"

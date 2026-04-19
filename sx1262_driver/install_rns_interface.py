@@ -24,7 +24,8 @@ interface_class = SX1262ReticulumInterface
 
 TELEMETRY_CONF = '''\
 # sx1262-telemetry-beacon configuration
-# One argument per line (argparse fromfile format: flag then value on next line).
+# One argument per line (flag on one line, value on the next).
+# Lines starting with # are ignored.
 # This file is loaded automatically when you run sx1262-telemetry-beacon.
 # Edit the values below to match your location.
 
@@ -36,6 +37,7 @@ TELEMETRY_CONF = '''\
 0
 --name
 MyPi
+# Uncomment and set --collector to send to a meshmap collector:
 # --collector
 # REPLACE_WITH_32_HEX_CHAR_COLLECTOR_HASH
 --interval
