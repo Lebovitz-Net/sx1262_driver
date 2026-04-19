@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
+
 """
 Reticulum Interface for SX1262 LoRa Transceiver
 
