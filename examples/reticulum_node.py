@@ -20,11 +20,12 @@ CONFIG = {
     "name": "sx1262_lora",
 
     # LoRa radio parameters
-    "frequency":        "910525000",    # Hz
-    "bandwidth":        "62500",        # Hz
-    "spreading_factor": "7",            # 7-12
+    "frequency":        "914875000",    # Hz
+    "bandwidth":        "125000",       # Hz
+    "spreading_factor": "9",            # 7-12
     "coding_rate":      "5",            # 5-8 (meaning 4/5 ... 4/8)
     "sync_word":        "0x1424",       # 0x1424 = private/MeshCore, 0x3444 = public LoRaWAN
+    "preamble_length":  "18",           # >= 18 required for RNode interoperability
 
     # SPI
     "spi_bus":    "0",
