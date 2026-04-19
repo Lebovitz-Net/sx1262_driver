@@ -307,7 +307,7 @@ class SX1262ReticulumInterface(Interface):
 
     def _handle_tx_done(self):
         """Called when transmit has completed; re-enter receive mode."""
-        self.logger("SX1262 Interface: TX complete, restarting RX", RNS.LOG_INFO)
+        self.logger("SX1262 Interface: TX complete, restarting RX", RNS.LOG_NOTICE)
         self._restart_receive()
 
     def _handle_rx_done(self, data, payload_length, irq_status):
@@ -391,7 +391,7 @@ class SX1262ReticulumInterface(Interface):
                 self._wait_for_idle()
                 self.radio.set_standby(STANDBY_RC)
                 self._wait_for_idle()
-                self.logger("SX1262 Interface: radio in STDBY, starting TX", RNS.LOG_INFO)
+                self.logger("SX1262 Interface: radio in STDBY, starting TX", RNS.LOG_NOTICE)
 
                 self.radio.begin_packet()
                 self.radio.write(list(data))
@@ -408,7 +408,7 @@ class SX1262ReticulumInterface(Interface):
                     self.logger("SX1262 Interface: TX timeout waiting for BUSY to clear", RNS.LOG_ERROR)
 
                 self.txb += len(data)
-                self.logger(f"SX1262 Interface: TX complete - {len(data)} bytes sent", RNS.LOG_INFO)
+                self.logger(f"SX1262 Interface: TX complete - {len(data)} bytes sent", RNS.LOG_NOTICE)
                 self._restart_receive()
                 self.radio._start_recv_loop()
             except Exception as e:
