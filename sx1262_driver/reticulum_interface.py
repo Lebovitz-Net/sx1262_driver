@@ -380,28 +380,43 @@ class SX1262ReticulumInterface(Interface):
         """
         if self.online and self.radio:
             try:
+                import lgpio  # type: ignore - pi only
+
                 # Stop the recv loop to avoid SPI bus contention during TX
                 self.radio._stop_recv_loop()
+                self.logger("SX1262 Interface: recv loop stopped for TX", RNS.LOG_DEBUG)
 
+                # Exit RX mode — SX1262 must be in STDBY before switching to TX
                 self._wait_for_idle()
+                self.radio.set_standby(STANDBY_RC)
+                self._wait_for_idle()
+                self.logger("SX1262 Interface: radio in STDBY, starting TX", RNS.LOG_INFO)
+
                 self.radio.begin_packet()
                 self.radio.write(list(data))
                 self.radio.end_packet()
 
-                # Wait for TX to complete (BUSY drops when TX is done)
+                # Wait for BUSY to assert (TX started), then wait for it to drop (TX done)
+                time.sleep(0.002)  # give chip time to assert BUSY
                 deadline = time.time() + (self.busy_timeout / 1000.0)
                 while time.time() < deadline:
-                    import lgpio  # type: ignore - pi only
                     if lgpio.gpio_read(self.radio.gpio_chip, self.radio._busy) == 0:
                         break
                     time.sleep(0.001)
+                else:
+                    self.logger("SX1262 Interface: TX timeout waiting for BUSY to clear", RNS.LOG_ERROR)
 
                 self.txb += len(data)
-                self.logger(f"SX1262 Interface: TX - {len(data)} bytes sent", RNS.LOG_INFO)
-                self._handle_tx_done()
+                self.logger(f"SX1262 Interface: TX complete - {len(data)} bytes sent", RNS.LOG_INFO)
+                self._restart_receive()
+                self.radio._start_recv_loop()
             except Exception as e:
                 self.logger(f"SX1262 Interface: TX error: {e}", RNS.LOG_ERROR)
-                self.radio._start_recv_loop()
+                try:
+                    self._restart_receive()
+                    self.radio._start_recv_loop()
+                except Exception:
+                    pass
                 raise e
     
     def should_ingress_limit(self):
