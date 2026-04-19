@@ -153,46 +153,10 @@ The venv binary has a shebang pointing to the venv Python, so all venv packages 
 
 ---
 
-## Mesh map visibility (optional)
+## Mesh map visibility
 
-[meshmap.reticulum.network](https://meshmap.reticulum.network) shows nodes that broadcast Reticulum telemetry with a fixed location.  This requires [Sideband](https://github.com/markqvist/Sideband) running alongside `rnsd`.
+[meshmap.reticulum.network](https://meshmap.reticulum.network) shows nodes that broadcast LXMF telemetry with a fixed location. This requires the [Sideband](https://github.com/markqvist/Sideband) application, which is designed for desktop/mobile use. `sbapp` is not practically installable on a headless Raspberry Pi (it pulls in Kivy/Android UI dependencies that require a Rust toolchain to build).
 
-### Install Sideband
-
-```bash
-pip install "sx1262_driver[sideband]"   # installs sbapp
-# or:
-pip install sbapp
-```
-
-### Configure fixed-location telemetry
-
-Run Sideband once to create its config file, then patch it with this project's helper script:
-
-```bash
-# Start Sideband to initialise config, then stop it
-sideband --daemon &
-sleep 5 && kill %1
-
-# Patch the config with your coordinates
-sx1262-configure-sideband --lat 42.3430 --lon -71.1270 --alt 15 --name "My Node"
-```
-
-Both `--lat` and `--lon` are required. `--alt` (metres, default `0.0`) and `--name` (display name on the map) are optional.
-
-### Run Sideband as a system service
-
-An example systemd unit is at `examples/sideband.service`. It starts **after** `rnsd.service` so the radio interface is already up. Adjust `User` and `ExecStart` as needed.
-
-```bash
-sudo cp examples/sideband.service /etc/systemd/system/sideband.service
-# edit User and ExecStart if needed
-sudo systemctl daemon-reload
-sudo systemctl enable sideband
-sudo systemctl start sideband
-sudo journalctl -u sideband -f
-```
-
-After a few minutes the node should appear on [meshmap.reticulum.network](https://meshmap.reticulum.network).
+If mesh map visibility is important, run Sideband on a separate desktop or laptop that is connected to the same Reticulum network via the TCP backbone.
 
 

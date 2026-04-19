@@ -28,11 +28,9 @@ keywords = ["sx1262","lora","lgpio","lorawan"]
 
 [project.optional-dependencies]
 reticulum = ["rns"]
-sideband = ["sbapp"]
 
 [project.scripts]
 sx1262-install-rns-interface = "sx1262_driver.install_rns_interface:main"
-sx1262-configure-sideband = "sx1262_driver.install_sideband_telemetry:main"
 
 [project.urls]
 Homepage = "https://github.com/yourname/sx1262-driver"
