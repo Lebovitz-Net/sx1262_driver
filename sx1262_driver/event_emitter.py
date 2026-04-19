@@ -9,22 +9,19 @@ import traceback
 class EventEmitter:
     def __init__(self):
         super().__init__()
-        loop = None
         self._event_listeners: Dict[str, List[dict]] = defaultdict(list)
         self._lock = threading.Lock()
+        self._owned_loop = False
 
-        if loop is not None:
-            # Explicit loop provided
-            self._loop = loop
-        else:
-            try:
-                # Preferred: running loop if inside async context
-                self._loop = asyncio.get_running_loop()
-            except RuntimeError:
-                print("[EventEmitter] Warning: No running event loop found ")
-                raise RuntimeError("EventEmitter requires an active asyncio event loop.")
-                # Fallback: default loop (may not be running yet)
-                # self._loop = asyncio.get_event_loop()
+        try:
+            # Preferred: running loop if inside async context
+            self._loop = asyncio.get_running_loop()
+        except RuntimeError:
+            # No running loop — create one and run it in a background daemon thread
+            self._loop = asyncio.new_event_loop()
+            self._owned_loop = True
+            t = threading.Thread(target=self._loop.run_forever, daemon=True)
+            t.start()
 
         # Track the thread ID that owns this loop
         self._loop_thread_id = getattr(self._loop, "_thread_id", threading.get_ident())
@@ -56,15 +53,9 @@ class EventEmitter:
                 if entry["type"] == "once":
                     self._event_listeners[event].remove(entry)
 
-        current_thread_id = threading.get_ident()
-
         for entry in listeners:
             coro = self._safe_invoke(entry["callback"], *args, **kwargs)
-
-            if current_thread_id != self._loop_thread_id:
-                self._loop.call_soon_threadsafe(asyncio.create_task, coro)
-            else:
-                self._loop.create_task(coro)
+            asyncio.run_coroutine_threadsafe(coro, self._loop)
 
 
     async def _safe_invoke(self, callback: Callable, *args, **kwargs):
