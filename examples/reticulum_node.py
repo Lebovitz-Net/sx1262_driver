@@ -54,6 +54,20 @@ def main():
     RNS.Transport.interfaces.append(iface)
 
     RNS.log(f"Interface online: {iface}", RNS.LOG_INFO)
+
+    # Create a destination and announce to verify TX is working.
+    # If TX succeeds you will see "SX1262 Interface: TX complete" in the log.
+    identity = RNS.Identity()
+    destination = RNS.Destination(
+        identity,
+        RNS.Destination.IN,
+        RNS.Destination.SINGLE,
+        "sx1262test",
+        "node",
+    )
+    destination.announce()
+    RNS.log(f"Announced as {RNS.prettyhexrep(destination.hash)}", RNS.LOG_INFO)
+
     RNS.log("Node running. Press Ctrl+C to stop.", RNS.LOG_INFO)
 
     try:
