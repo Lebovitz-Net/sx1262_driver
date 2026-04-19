@@ -271,7 +271,7 @@ BW = 62500
 CR = 5
 LDRO = False
 HEADER_TYPE = HEADER_EXPLICIT
-PREAMBLE_LENGTH = 8
+PREAMBLE_LENGTH = 18  # RNode firmware minimum; must be >= 18 to be received by RNode devices
 PAYLOAD_LENGTH = 256
 CRC_TYPE = CRC_ON
 INVERT_IQ = IQ_STANDARD

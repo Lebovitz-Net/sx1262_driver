@@ -19,6 +19,7 @@ Configuration example (in ~/.reticulum/config):
       spreading_factor = 7
       coding_rate = 5
       sync_word = 0x1424
+      preamble_length = 18
       
       # GPIO/SPI Configuration (BCM numbering)
       spi_bus = 0
@@ -125,6 +126,9 @@ class SX1262ReticulumInterface(Interface):
             self.irq_pin = int(c.get("irq_pin", "-1"))
             self.nss_pin = int(c.get("nss_pin", "21"))
             
+            # Preamble length — must be >= 18 to be received by RNode firmware devices
+            self.preamble_length = int(c.get("preamble_length", str(PREAMBLE_LENGTH)))
+
             # Hardware watchdogs
             self.busy_timeout = int(c.get("busy_timeout", str(BUSY_TIMEOUT)))
             
@@ -193,7 +197,7 @@ class SX1262ReticulumInterface(Interface):
         
         self.radio.set_lora_packet(
             header_type=HEADER_EXPLICIT,
-            preamble_length=PREAMBLE_LENGTH,
+            preamble_length=self.preamble_length,
             payload_length=PAYLOAD_LENGTH,
             crc_type=CRC_ON,
             invert_iq=IQ_STANDARD
