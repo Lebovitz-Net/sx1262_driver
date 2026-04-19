@@ -136,4 +136,19 @@ Reticulum will load the SX1262 interface automatically from the config file.
 - `irq_pin = -1` and `use_irq = false` (default): polling mode, no IRQ wiring required
 - Set `irq_pin` to your DIO1 BCM pin and `use_irq = true` to enable interrupt-driven receive
 
+### Running rnsd as a system service
+
+An example systemd unit file is provided at `examples/rnsd.service`. It references the user venv at `/home/gregg/.venv` — adjust `User` and `ExecStart` if your username or venv path differs.
+
+```bash
+sudo cp examples/rnsd.service /etc/systemd/system/rnsd.service
+# edit User and ExecStart if needed
+sudo systemctl daemon-reload
+sudo systemctl enable rnsd
+sudo systemctl start rnsd
+sudo journalctl -u rnsd -f   # follow logs
+```
+
+The venv binary has a shebang pointing to the venv Python, so all venv packages (including `sx1262_driver` and `rns`) are available without activating the venv first.
+
 
