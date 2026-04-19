@@ -76,4 +76,38 @@ You can also install the package directly from this repository (useful for CI or
 pip install git+https://github.com/Lebovitz-Net/sx1262_driver.git
 ```
 
+## Reticulum support
+The package includes an optional Reticulum interface implementation in `sx1262_driver.reticulum_interface`.
+
+### Install with Reticulum support
+If you want the Reticulum integration and its Python dependency, install the optional `reticulum` extra:
+
+```bash
+pip install "sx1262_driver[reticulum]"
+```
+
+When installing directly from this repository, use:
+
+```bash
+pip install "git+https://github.com/Lebovitz-Net/sx1262_driver.git#egg=sx1262_driver[reticulum]"
+```
+
+If you build a wheel or source distribution locally, you can also install the extra from the project root:
+
+```bash
+pip install ".[reticulum]"
+```
+
+### Reticulum configuration
+An example Reticulum configuration is provided in `examples/reticulum_config_example.ini`.
+
+Copy the relevant interface block into `~/.reticulum/config` on the Raspberry Pi and adjust the radio parameters and GPIO pin assignments for your hardware.
+
+The Reticulum interface supports both polling mode and optional DIO1 IRQ handling:
+
+- Set `irq_pin = -1` to keep using polling mode
+- Set `irq_pin` to your DIO1 BCM pin and `use_irq = true` to enable interrupt-driven receive handling
+
+The interface type name for Reticulum configuration is `SX1262ReticulumInterface`.
+
 
