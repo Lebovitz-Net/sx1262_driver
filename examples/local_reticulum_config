@@ -6,5 +6,5 @@
   [[RNS Backbone]]
     type = TCPClientInterface
     enabled = yes
-    target_host = reticulum.betweentheborders.com
+    target_host = rns.noderage.org
     target_port = 4242
