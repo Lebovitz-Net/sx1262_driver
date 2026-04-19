@@ -31,3 +31,5 @@ import sys
 import os
 
 from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
+
+interface_class = SX1262ReticulumInterface

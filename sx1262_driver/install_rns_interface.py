@@ -17,6 +17,8 @@ WRAPPER_CONTENT = '''\
 # Re-run that command after upgrading sx1262_driver to refresh this file.
 
 from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
+
+interface_class = SX1262ReticulumInterface
 '''
 
 RETICULUM_CONFIG = '''\
