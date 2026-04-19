@@ -213,14 +213,15 @@ class SX1262ReticulumInterface(Interface):
             self._start_irq_monitor()
         
         self.logger(
-            f"SX1262 Interface: Radio configured - "
-            f"Freq={self.frequency/1e6:.3f}MHz, "
-            f"SF={self.spreading_factor}, "
-            f"BW={self.bandwidth}, "
-            f"CR=4/{self.coding_rate}, "
-            f"LDRO={self.ldro}, "
-            f"SyncWord=0x{self.sync_word:04x}",
-            RNS.LOG_INFO
+            f"SX1262 Interface: Radio configured:\n"
+            f"  Frequency  : {self.frequency/1e6:.3f} MHz\n"
+            f"  Bandwidth  : {self.bandwidth/1e3:.1f} kHz\n"
+            f"  Spreading  : SF{self.spreading_factor}\n"
+            f"  Coding Rate: 4/{self.coding_rate}\n"
+            f"  LDRO       : {self.ldro}\n"
+            f"  Preamble   : {self.preamble_length} symbols\n"
+            f"  Sync Word  : 0x{self.sync_word:04x}",
+            RNS.LOG_NOTICE
         )
     
     def _compute_ldro(self, sf: int, bw: int) -> bool:
