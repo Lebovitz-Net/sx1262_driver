@@ -306,7 +306,7 @@ class SX1262ReticulumInterface(Interface):
 
     def _handle_tx_done(self):
         """Called when transmit has completed; re-enter receive mode."""
-        self.logger("SX1262 Interface: TX complete, restarting RX", RNS.LOG_DEBUG)
+        self.logger("SX1262 Interface: TX complete, restarting RX", RNS.LOG_INFO)
         self._restart_receive()
 
     def _handle_rx_done(self, data, payload_length, irq_status):
@@ -320,7 +320,7 @@ class SX1262ReticulumInterface(Interface):
                 f"SX1262 Interface: RX_DONE - {payload_length} bytes, "
                 f"RSSI={self.radio.packet_rssi():.1f}dBm, "
                 f"SNR={self.radio.snr():.1f}dB",
-                RNS.LOG_DEBUG
+                RNS.LOG_INFO
             )
             self.process_incoming(data)
         except Exception as e:
@@ -332,7 +332,7 @@ class SX1262ReticulumInterface(Interface):
             f"SX1262 Interface: RX error - "
             f"RSSI={self.radio.packet_rssi():.1f}dBm, "
             f"SNR={self.radio.snr():.1f}dB",
-            RNS.LOG_DEBUG
+            RNS.LOG_INFO
         )
         self._restart_receive()
     
