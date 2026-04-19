@@ -2,14 +2,13 @@
 Console script: sx1262-install-rns-interface
 
 Installs the SX1262ReticulumInterface.py wrapper into ~/.reticulum/interfaces/
-so that Reticulum can load the SX1262 interface from its config file.
+and writes a starter ~/.reticulum/config if one does not already exist.
 
 Usage:
     sx1262-install-rns-interface
 """
 
 import os
-import shutil
 import sys
 
 
@@ -20,40 +19,56 @@ WRAPPER_CONTENT = '''\
 from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
 '''
 
-CONFIG_EXAMPLE = '''\
+RETICULUM_CONFIG = '''\
+[interfaces]
 
-# Add this to ~/.reticulum/config under [interfaces]:
-#
-#   [[SX1262 LoRa Interface]]
-#     type = SX1262ReticulumInterface
-#     enabled = yes
-#     name = sx1262_lora
-#     frequency = 914875000
-#     bandwidth = 125000
-#     spreading_factor = 9
-#     coding_rate = 5
-#     sync_word = 0x1424
-#     preamble_length = 18
-#     spi_bus = 0
-#     spi_device = 0
-#     reset_pin = 18
-#     busy_pin = 20
-#     irq_pin = -1
-#     nss_pin = 21
-#     use_irq = false
+  [[RNS Backbone]]
+    type = TCPClientInterface
+    enabled = yes
+    target_host = rns.noderage.org
+    target_port = 4242
+
+  [[SX1262 LoRa Interface]]
+    type = SX1262ReticulumInterface
+    enabled = yes
+    name = sx1262_lora
+    frequency = 914875000
+    bandwidth = 125000
+    spreading_factor = 9
+    coding_rate = 5
+    sync_word = 0x1424
+    preamble_length = 18
+    spi_bus = 0
+    spi_device = 0
+    reset_pin = 18
+    busy_pin = 20
+    irq_pin = -1
+    nss_pin = 21
+    use_irq = false
 '''
 
 
 def main():
-    interfaces_dir = os.path.expanduser("~/.reticulum/interfaces")
+    reticulum_dir = os.path.expanduser("~/.reticulum")
+    interfaces_dir = os.path.join(reticulum_dir, "interfaces")
     os.makedirs(interfaces_dir, exist_ok=True)
 
-    dest = os.path.join(interfaces_dir, "SX1262ReticulumInterface.py")
-    with open(dest, "w") as f:
+    # Always refresh the wrapper (safe to overwrite — it's auto-generated)
+    wrapper_dest = os.path.join(interfaces_dir, "SX1262ReticulumInterface.py")
+    with open(wrapper_dest, "w") as f:
         f.write(WRAPPER_CONTENT)
+    print(f"Installed: {wrapper_dest}")
 
-    print(f"Installed: {dest}")
-    print(CONFIG_EXAMPLE)
+    # Only write config if it doesn't already exist
+    config_dest = os.path.join(reticulum_dir, "config")
+    if not os.path.exists(config_dest):
+        with open(config_dest, "w") as f:
+            f.write(RETICULUM_CONFIG)
+        print(f"Created:   {config_dest}")
+    else:
+        print(f"Skipped:   {config_dest} (already exists — edit manually if needed)")
+        print("\nEnsure ~/.reticulum/config contains an [[SX1262 LoRa Interface]] section.")
+        print("See RETICULUM_CONFIG in sx1262_driver/install_rns_interface.py for reference.")
 
 
 if __name__ == "__main__":
