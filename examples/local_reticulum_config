@@ -1,0 +1,26 @@
+[interfaces]
+
+  [[SX1262 LoRa Interface]]
+    type = SX1262ReticulumInterface
+    enabled = yes
+    name = sx1262_lora
+    frequency = 914875000
+    bandwidth = 125000
+    spreading_factor = 9
+    coding_rate = 5
+    sync_word = 0x1424
+    preamble_length = 18
+    spi_bus = 0
+    spi_device = 0
+    reset_pin = 18
+    busy_pin = 20
+    irq_pin = -1
+    nss_pin = 21
+    use_irq = false
+
+  [[RNS Backbone]]
+    type = TCPClientInterface
+    enabled = yes
+    target_host = reticulum.betweentheborders.com
+    target_port = 4242
+    
