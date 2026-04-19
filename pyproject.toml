@@ -8,7 +8,6 @@ version = "0.1.0"
 description = "Event-driven SX1262 LoRa driver for Raspberry Pi using lgpio"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
-license-files = ["LICENSE"]
 authors = [
   { name = "Gregg A. Lebovitz" }
 ]
@@ -24,11 +23,16 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Operating System :: POSIX :: Linux",
 ]
+
+[project.optional-dependencies]
+reticulum = ["rns"]
+
 keywords = ["sx1262","lora","lgpio","lorawan"]
 
 [project.urls]
 Homepage = "https://github.com/yourname/sx1262-driver"
 
-[tool.setuptools.packages.find]
-where = ["."]
+[tool.setuptools]
+license-files = ["LICENSE"]
+packages.find.where = ["."]
 include = ["sx1262_driver*"]
