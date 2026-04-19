@@ -1,8 +1,9 @@
 """
 Console script: sx1262-install-rns-interface
 
-Installs the SX1262ReticulumInterface.py wrapper into ~/.reticulum/interfaces/
-and writes a starter ~/.reticulum/config if one does not already exist.
+Installs the SX1262ReticulumInterface.py wrapper into ~/.reticulum/interfaces/,
+writes a starter ~/.reticulum/config if one does not already exist, and writes
+a starter ~/.reticulum/telemetry_beacon.conf if one does not already exist.
 
 Usage:
     sx1262-install-rns-interface
@@ -19,6 +20,26 @@ WRAPPER_CONTENT = '''\
 from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
 
 interface_class = SX1262ReticulumInterface
+'''
+
+TELEMETRY_CONF = '''\
+# sx1262-telemetry-beacon configuration
+# One argument per line (argparse fromfile format: flag then value on next line).
+# This file is loaded automatically when you run sx1262-telemetry-beacon.
+# Edit the values below to match your location.
+
+--lat
+0.0
+--lon
+0.0
+--alt
+0
+--name
+MyPi
+# --collector
+# REPLACE_WITH_32_HEX_CHAR_COLLECTOR_HASH
+--interval
+300
 '''
 
 RETICULUM_CONFIG = '''\
@@ -79,6 +100,16 @@ def main():
         print(f"Skipped:   {config_dest} (already exists — edit manually if needed)")
         print("\nEnsure ~/.reticulum/config contains an [[SX1262 LoRa Interface]] section.")
         print("See RETICULUM_CONFIG in sx1262_driver/install_rns_interface.py for reference.")
+
+    # Only write telemetry config if it doesn't already exist
+    telemetry_conf_dest = os.path.join(reticulum_dir, "telemetry_beacon.conf")
+    if not os.path.exists(telemetry_conf_dest):
+        with open(telemetry_conf_dest, "w") as f:
+            f.write(TELEMETRY_CONF)
+        print(f"Created:   {telemetry_conf_dest}")
+        print("           Edit it to set your coordinates, name, and collector hash.")
+    else:
+        print(f"Skipped:   {telemetry_conf_dest} (already exists)")
 
 
 if __name__ == "__main__":
