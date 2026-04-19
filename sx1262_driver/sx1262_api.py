@@ -119,6 +119,8 @@ class SX1262Api:
 
     def get_irq_status(self) -> int:
         buf = self._read_bytes(0x12, 3)
+        if len(buf) < 3:
+            return 0
         return (buf[1] << 8) | buf[2]
 
     def clear_irq_status(self, clear_irq_param: int):
