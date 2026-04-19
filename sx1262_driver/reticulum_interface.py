@@ -382,7 +382,7 @@ class SX1262ReticulumInterface(Interface):
             try:
                 self._wait_for_idle()
                 self.radio.send_packet(
-                    data,
+                    list(data),
                     tx_header_type=HEADER_EXPLICIT,
                     tx_crc_type=CRC_ON,
                     tx_invert_iq=IQ_STANDARD,
