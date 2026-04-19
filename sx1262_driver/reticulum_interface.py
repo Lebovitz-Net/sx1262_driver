@@ -381,14 +381,11 @@ class SX1262ReticulumInterface(Interface):
         if self.online and self.radio:
             try:
                 self._wait_for_idle()
-                self.radio.send_packet(
-                    list(data),
-                    tx_header_type=HEADER_EXPLICIT,
-                    tx_crc_type=CRC_ON,
-                    tx_invert_iq=IQ_STANDARD,
-                )
+                self.radio.begin_packet()
+                self.radio.write(list(data))
+                self.radio.end_packet()
                 self.txb += len(data)
-                self.logger(f"SX1262 Interface: TX - {len(data)} bytes", RNS.LOG_DEBUG)
+                self.logger(f"SX1262 Interface: TX - {len(data)} bytes queued", RNS.LOG_INFO)
             except Exception as e:
                 self.logger(f"SX1262 Interface: TX error: {e}", RNS.LOG_ERROR)
                 raise e
