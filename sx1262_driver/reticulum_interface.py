@@ -25,6 +25,7 @@ Configuration example (in ~/.reticulum/config):
       busy_pin = 20
       irq_pin = -1
       nss_pin = 21
+      use_irq = false
 """
 
 import time
@@ -45,6 +46,8 @@ from .sx1262_constants import (
     CRC_ON,
     IQ_STANDARD,
     RX_GAIN_BOOSTED,
+    IRQ_ALL,
+    BUSY_TIMEOUT,
 )
 
 
@@ -74,6 +77,7 @@ class SX1262ReticulumInterface(Interface):
         self.owner = owner
         self.online = False
         self.radio = None
+        self.irq_thread = None
         
         # Parse configuration
         try:
@@ -88,13 +92,22 @@ class SX1262ReticulumInterface(Interface):
             self.spreading_factor = int(c.get("spreading_factor", "7"))
             self.coding_rate = int(c.get("coding_rate", "5"))
             
+            # LDRO handling: auto-calculate for SF11/SF12 and narrow bandwidths
+            ldro_cfg = c.get("ldro", "auto").strip().lower()
+            if ldro_cfg in ("true", "1", "yes", "on"):
+                self.ldro = True
+            elif ldro_cfg in ("false", "0", "no", "off"):
+                self.ldro = False
+            else:
+                self.ldro = self._compute_ldro(self.spreading_factor, self.bandwidth)
+            
             # Sync word handling
             sync_word_str = c.get("sync_word", "0x1424")
             if sync_word_str.startswith("0x"):
                 self.sync_word = int(sync_word_str, 16)
-            elif sync_word_str == "PUBLIC":
+            elif sync_word_str.upper() == "PUBLIC":
                 self.sync_word = LORA_SYNC_WORD_PUBLIC
-            elif sync_word_str == "PRIVATE":
+            elif sync_word_str.upper() == "PRIVATE":
                 self.sync_word = LORA_SYNC_WORD_PRIVATE
             else:
                 self.sync_word = int(sync_word_str)
@@ -108,6 +121,12 @@ class SX1262ReticulumInterface(Interface):
             self.busy_pin = int(c.get("busy_pin", "20"))
             self.irq_pin = int(c.get("irq_pin", "-1"))
             self.nss_pin = int(c.get("nss_pin", "21"))
+            
+            # Hardware watchdogs
+            self.busy_timeout = int(c.get("busy_timeout", str(BUSY_TIMEOUT)))
+            
+            # IRQ mode
+            self.use_irq = c.get("use_irq", "false").strip().lower() in ("true", "1", "yes", "on")
             
         except Exception as e:
             self.logger(f"SX1262 Interface: Configuration error: {e}", RNS.LOG_ERROR)
@@ -146,11 +165,17 @@ class SX1262ReticulumInterface(Interface):
         
         if not ok:
             raise RuntimeError("SX1262 failed to enter STDBY_RC. Check BUSY, RESET, NSS wiring.")
-        
+
+        if self.use_irq and self.irq_pin != -1:
+            # Ensure the driver uses DIO1 for IRQ mapping when physical IRQ pin is configured
+            self.radio.set_rf_irq_pin(1)
+            self.radio._stop_recv_loop()
+
         # Register event handlers
         self.radio.on("rx_done", self._handle_rx_done)
         self.radio.on("rx_error", self._handle_rx_error)
         self.radio.on("timeout", self._handle_timeout)
+        self.radio.on_transmit(self._handle_tx_done)
         
         # Configure radio parameters
         self.radio.set_sync_word(self.sync_word)
@@ -160,7 +185,7 @@ class SX1262ReticulumInterface(Interface):
             sf=self.spreading_factor,
             bw=self.bandwidth,
             cr=self.coding_rate,
-            ldro=False,
+            ldro=int(self.ldro),
         )
         
         self.radio.set_lora_packet(
@@ -176,6 +201,9 @@ class SX1262ReticulumInterface(Interface):
         # Start continuous receive
         self.radio.request(RX_CONTINUOUS)
         self.online = True
+
+        if self.use_irq and self.irq_pin != -1:
+            self._start_irq_monitor()
         
         self.logger(
             f"SX1262 Interface: Radio configured - "
@@ -183,10 +211,102 @@ class SX1262ReticulumInterface(Interface):
             f"SF={self.spreading_factor}, "
             f"BW={self.bandwidth}, "
             f"CR=4/{self.coding_rate}, "
+            f"LDRO={self.ldro}, "
             f"SyncWord=0x{self.sync_word:04x}",
             RNS.LOG_INFO
         )
     
+    def _compute_ldro(self, sf: int, bw: int) -> bool:
+        """Return True when low data rate optimization is required."""
+        symbol_duration = (2 ** sf) / float(bw)
+        return symbol_duration > 0.016
+
+    def _wait_for_idle(self):
+        """Wait for BUSY to clear, or raise if stuck."""
+        if self.radio.busy_check(timeout=self.busy_timeout):
+            raise RuntimeError(f"SX1262 BUSY stuck high for {self.busy_timeout} ms")
+
+    def _restart_receive(self):
+        """Clear IRQs and re-enter continuous receive mode."""
+        if not self.online or self.radio is None:
+            return
+        try:
+            self.radio.clear_irq_status(IRQ_ALL)
+            self.radio.request(RX_CONTINUOUS)
+            self.logger("SX1262 Interface: restarted RX continuous", RNS.LOG_DEBUG)
+        except Exception as e:
+            self.logger(f"SX1262 Interface: failed to restart RX: {e}", RNS.LOG_ERROR)
+    
+    def _start_irq_monitor(self):
+        """Start an optional DIO1 IRQ monitor thread."""
+        if self.irq_thread is not None:
+            return
+
+        self.irq_thread = threading.Thread(target=self._irq_monitor_loop, daemon=True)
+        self.irq_thread.start()
+
+    def _irq_monitor_loop(self):
+        """Monitor the physical IRQ pin and dispatch radio IRQ events."""
+        try:
+            import lgpio  # type: ignore - pi only
+        except ImportError:
+            self.logger("SX1262 Interface: lgpio not available for IRQ monitoring", RNS.LOG_WARNING)
+            return
+
+        if self.radio is None or self.radio.gpio_chip is None or self.radio._irq == -1:
+            self.logger("SX1262 Interface: IRQ monitor not started due to missing IRQ pin", RNS.LOG_WARNING)
+            return
+
+        self.logger("SX1262 Interface: starting DIO1 IRQ monitor", RNS.LOG_INFO)
+        use_event = hasattr(lgpio, "gpio_wait_event")
+        last_state = None
+
+        while self._should_run and self.online:
+            try:
+                if use_event:
+                    event = lgpio.gpio_wait_event(self.radio.gpio_chip, self.radio._irq, 1000)
+                    if not event:
+                        continue
+                else:
+                    state = lgpio.gpio_read(self.radio.gpio_chip, self.radio._irq)
+                    if last_state is None:
+                        last_state = state
+                        continue
+                    if state == last_state:
+                        time.sleep(0.001)
+                        continue
+                    last_state = state
+                    if state == 0:
+                        continue
+
+                self._handle_irq_pin()
+            except Exception as e:
+                self.logger(f"SX1262 Interface: IRQ monitor error: {e}", RNS.LOG_ERROR)
+                time.sleep(0.1)
+
+        self.logger("SX1262 Interface: DIO1 IRQ monitor stopped", RNS.LOG_DEBUG)
+
+    def _handle_irq_pin(self):
+        """Process a physical IRQ pin event by reading and dispatching chip IRQ status."""
+        if self.radio is None:
+            return
+
+        try:
+            irq = self.radio.get_irq_status()
+            if irq and irq <= 0x3FF:
+                self.radio.clear_irq_status(irq)
+                if hasattr(self.radio, "_handle_irq"):
+                    self.radio._handle_irq(irq, None)
+                else:
+                    self.logger("SX1262 Interface: radio has no internal IRQ handler", RNS.LOG_WARNING)
+        except Exception as e:
+            self.logger(f"SX1262 Interface: failed to handle IRQ pin event: {e}", RNS.LOG_ERROR)
+
+    def _handle_tx_done(self):
+        """Called when transmit has completed; re-enter receive mode."""
+        self.logger("SX1262 Interface: TX complete, restarting RX", RNS.LOG_DEBUG)
+        self._restart_receive()
+
     def _handle_rx_done(self, data, payload_length, irq_status):
         """
         Handle received packet from radio.
@@ -212,10 +332,12 @@ class SX1262ReticulumInterface(Interface):
             f"SNR={self.radio.snr():.1f}dB",
             RNS.LOG_DEBUG
         )
+        self._restart_receive()
     
     def _handle_timeout(self, irq_status):
         """Handle RX timeout (no packet received in expected time)."""
-        self.logger("SX1262 Interface: RX timeout", RNS.LOG_DEBUG)
+        self.logger("SX1262 Interface: RX timeout", RNS.LOG_WARNING)
+        self._restart_receive()
     
     def _start_read_thread(self):
         """Start background thread for radio event polling."""
@@ -256,7 +378,7 @@ class SX1262ReticulumInterface(Interface):
         """
         if self.online and self.radio:
             try:
-                # Set TX mode and transmit
+                self._wait_for_idle()
                 self.radio.transmit(data)
                 self.txb += len(data)
                 self.logger(f"SX1262 Interface: TX - {len(data)} bytes", RNS.LOG_DEBUG)
@@ -278,7 +400,10 @@ class SX1262ReticulumInterface(Interface):
         self.logger(f"SX1262 Interface: Detaching {self.name}", RNS.LOG_INFO)
         self.online = False
         self._should_run = False
-        
+
+        if self.irq_thread is not None and self.irq_thread.is_alive():
+            self.irq_thread.join(timeout=1.0)
+
         if self.radio:
             try:
                 self.radio.end()
