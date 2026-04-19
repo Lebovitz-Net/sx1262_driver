@@ -30,10 +30,4 @@
 import sys
 import os
 
-# Resolve through symlinks to find the actual project root
-_this_file = os.path.realpath(__file__)
-_project_root = os.path.dirname(os.path.dirname(_this_file))
-if _project_root not in sys.path:
-    sys.path.insert(0, _project_root)
-
 from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
