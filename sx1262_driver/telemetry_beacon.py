@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 sx1262-telemetry-beacon: Broadcast a fixed GPS coordinate as Reticulum/LXMF
 telemetry in Sideband-compatible format (visible on meshmap.reticulum.network).
@@ -165,7 +165,7 @@ def main():
         identity,
         display_name=display_name,
     )
-    RNS.log(f"Beacon LXMF address: {RNS.prettyhex(lxmf_dest.hash)}")
+    RNS.log(f"Beacon LXMF address: {RNS.prettyhexrep(lxmf_dest.hash)}")
 
     # Validate and store collector hash.
     collector_hash = None
@@ -180,7 +180,7 @@ def main():
                     f"({expected_len * 2} hex chars), "
                     f"got {len(collector_hash)}"
                 )
-            RNS.log(f"Collector: {RNS.prettyhex(collector_hash)}")
+            RNS.log(f"Collector: {RNS.prettyhexrep(collector_hash)}")
         except Exception as exc:
             RNS.log(f"Invalid --collector address: {exc}", RNS.LOG_ERROR)
             sys.exit(1)
@@ -206,7 +206,7 @@ def main():
         dest_identity = RNS.Identity.recall(collector_hash)
         if dest_identity is None:
             RNS.log(
-                f"Collector {RNS.prettyhex(collector_hash)} identity not yet "
+                f"Collector {RNS.prettyhexrep(collector_hash)} identity not yet "
                 "known — requesting path. Will retry next interval.",
                 RNS.LOG_WARNING,
             )
@@ -235,7 +235,7 @@ def main():
 
         router.handle_outbound(lxm)
         RNS.log(
-            f"Telemetry queued → collector {RNS.prettyhex(collector_hash)}"
+            f"Telemetry queued → collector {RNS.prettyhexrep(collector_hash)}"
         )
 
     # Graceful shutdown on SIGINT / SIGTERM.
