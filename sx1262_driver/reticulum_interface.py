@@ -50,6 +50,7 @@ from .sx1262_constants import (
     RX_GAIN_BOOSTED,
     IRQ_ALL,
     BUSY_TIMEOUT,
+    STANDBY_RC,
 )
 
 
