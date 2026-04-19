@@ -380,14 +380,28 @@ class SX1262ReticulumInterface(Interface):
         """
         if self.online and self.radio:
             try:
+                # Stop the recv loop to avoid SPI bus contention during TX
+                self.radio._stop_recv_loop()
+
                 self._wait_for_idle()
                 self.radio.begin_packet()
                 self.radio.write(list(data))
                 self.radio.end_packet()
+
+                # Wait for TX to complete (BUSY drops when TX is done)
+                deadline = time.time() + (self.busy_timeout / 1000.0)
+                while time.time() < deadline:
+                    import lgpio  # type: ignore - pi only
+                    if lgpio.gpio_read(self.radio.gpio_chip, self.radio._busy) == 0:
+                        break
+                    time.sleep(0.001)
+
                 self.txb += len(data)
-                self.logger(f"SX1262 Interface: TX - {len(data)} bytes queued", RNS.LOG_INFO)
+                self.logger(f"SX1262 Interface: TX - {len(data)} bytes sent", RNS.LOG_INFO)
+                self._handle_tx_done()
             except Exception as e:
                 self.logger(f"SX1262 Interface: TX error: {e}", RNS.LOG_ERROR)
+                self.radio._start_recv_loop()
                 raise e
     
     def should_ingress_limit(self):
