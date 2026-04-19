@@ -23,16 +23,17 @@ classifiers = [
   "Programming Language :: Python :: 3 :: Only",
   "Operating System :: POSIX :: Linux",
 ]
+keywords = ["sx1262","lora","lgpio","lorawan"]
 
 [project.optional-dependencies]
 reticulum = ["rns"]
-
-keywords = ["sx1262","lora","lgpio","lorawan"]
 
 [project.urls]
 Homepage = "https://github.com/yourname/sx1262-driver"
 
 [tool.setuptools]
 license-files = ["LICENSE"]
-packages.find.where = ["."]
+
+[tool.setuptools.packages.find]
+where = ["."]
 include = ["sx1262_driver*"]
