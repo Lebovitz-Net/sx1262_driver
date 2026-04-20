@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
 """
 Reticulum node using the SX1262 LoRa interface.
 
