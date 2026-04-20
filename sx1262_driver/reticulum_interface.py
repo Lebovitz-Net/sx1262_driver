@@ -81,6 +81,9 @@ class SX1262ReticulumInterface(Interface):
         self.logger = RNS.log
         self.owner = owner
         self.online = False
+        # Aliases expected by RNS Discovery for RNodeInterface-style announce data
+        self.sf = None  # set after config parse
+        self.cr = None  # set after config parse
         self.radio = None
         self.irq_thread = None
         
@@ -129,6 +132,10 @@ class SX1262ReticulumInterface(Interface):
             
             # Preamble length — must be >= 18 to be received by RNode firmware devices
             self.preamble_length = int(c.get("preamble_length", str(PREAMBLE_LENGTH)))
+
+            # RNS Discovery aliases (used by Discovery.py for RNodeInterface-style announce)
+            self.sf = self.spreading_factor
+            self.cr = self.coding_rate
 
             # Hardware watchdogs
             self.busy_timeout = int(c.get("busy_timeout", str(BUSY_TIMEOUT)))
