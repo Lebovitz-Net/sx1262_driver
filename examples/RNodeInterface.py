@@ -1,16 +1,16 @@
-# SX1262ReticulumInterface.py
+# RNodeInterface.py
 #
 # Place this file (or a symlink to it) in ~/.reticulum/interfaces/
 # so Reticulum can load the SX1262 interface from the config file.
 #
 # Symlink setup on Pi:
-#   ln -s ~/Projects/sx1262_driver/examples/SX1262ReticulumInterface.py \
-#         ~/.reticulum/interfaces/SX1262ReticulumInterface.py
+#   ln -s ~/Projects/sx1262_driver/examples/RNodeInterface.py \
+#         ~/.reticulum/interfaces/RNodeInterface.py
 #
 # Then in ~/.reticulum/config:
 #
 #   [[SX1262 LoRa Interface]]
-#     type = SX1262ReticulumInterface
+#     type = RNodeInterface
 #     enabled = yes
 #     name = sx1262_lora
 #     frequency = 914875000
@@ -30,6 +30,6 @@
 import sys
 import os
 
-from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
+from sx1262_driver.reticulum_interface import RNodeInterface
 
-interface_class = SX1262ReticulumInterface
+interface_class = RNodeInterface
