@@ -77,6 +77,7 @@ class SX1262ReticulumInterface(Interface):
         """
         super().__init__()
         
+        self.supports_discovery = True
         self.logger = RNS.log
         self.owner = owner
         self.online = False
