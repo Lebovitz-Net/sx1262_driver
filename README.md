@@ -215,4 +215,71 @@ sudo systemctl enable --now telemetry_beacon.service
 
 The unit depends on `rnsd.service` and starts after it.
 
+---
+
+## Interface discovery (rmap.world)
+
+Reticulum 1.1+ includes a built-in [discoverable interfaces](https://reticulum.network/manual/interfaces.html#discoverable-interfaces) system that periodically broadcasts a signed announce packet containing your node's connection details, location, and radio parameters. Community map sites such as [rmap.world](https://rmap.world) listen for these announces and display discovered nodes automatically — no collector hash or Sideband required.
+
+> **Note:** Interface discovery requires the `lxmf` package to be installed (`pip install lxmf`).
+
+### How it works
+
+When `discoverable = yes` is set on an interface, `rnsd` will:
+
+1. Generate a proof-of-work cryptographic stamp for the interface (cached after first run)
+2. Broadcast a discovery announce over the network at the configured `announce_interval`
+3. Automatically configure the interface in `gateway` or `access_point` mode if not explicitly set
+
+Peers (and map aggregators like rmap.world) receive these announces via the standard `rnstransport.discovery.interface` destination and can auto-connect or display the node.
+
+### Configuration
+
+Add the following options to your `[[SX1262 LoRa Interface]]` block in `~/.reticulum/config`:
+
+```ini
+[[SX1262 LoRa Interface]]
+  type = SX1262ReticulumInterface
+  enabled = yes
+  # ... existing radio parameters ...
+
+  # Enable interface discovery
+  discoverable = yes
+  discovery_name = My LoRa Node
+  announce_interval = 360        # minutes between announces (default 360)
+
+  # Physical location (decimal degrees / meters) — displayed on rmap.world
+  latitude  = 42.9956
+  longitude = -71.4548
+  height    = 50
+
+  # Radio parameters broadcast to peers
+  discovery_frequency = 914875000   # Hz
+  discovery_bandwidth = 125000      # Hz
+```
+
+| Option | Description |
+|---|---|
+| `discoverable` | `yes` to enable; triggers gateway/AP mode automatically |
+| `discovery_name` | Human-readable label shown on the map |
+| `announce_interval` | Minutes between announces (minimum 5) |
+| `latitude` / `longitude` / `height` | Decimal degrees and meters; used for map placement |
+| `discovery_frequency` | Operating frequency in Hz |
+| `discovery_bandwidth` | Signal bandwidth in Hz |
+| `discovery_stamp_value` | Proof-of-work difficulty (default 14; higher = more CPU, more spam-resistant) |
+
+### Custom interface note
+
+The `SX1262ReticulumInterface` explicitly sets `self.supports_discovery = True` so that the RNS discovery loop includes it. The base `Interface` class defaults this to `False`; only built-in types like `RNodeInterface` and `TCPInterface` set it automatically.
+
+### Checking status
+
+After restarting `rnsd`, confirm the interface is in gateway mode:
+
+```bash
+rnstatus
+```
+
+You should see `Mode : Gateway` on the SX1262 interface. The first announce fires after the initial proof-of-work stamp is computed (a few seconds on modern hardware). Subsequent announces respect `announce_interval`.
+
 
