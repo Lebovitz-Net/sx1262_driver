@@ -12,7 +12,7 @@ Adjust the pin and radio parameters below to match your hardware.
 
 import time
 import RNS
-from sx1262_driver.reticulum_interface import SX1262ReticulumInterface
+from sx1262_driver.reticulum_interface import SX1262Interface
 
 # ---- Radio and GPIO configuration ----
 # Adjust these to match your hardware wiring (BCM pin numbering)
@@ -48,7 +48,7 @@ def main():
     RNS.log("Starting SX1262 Reticulum node...", RNS.LOG_INFO)
 
     # Instantiate and register the SX1262 interface
-    iface = SX1262ReticulumInterface(
+    iface = SX1262Interface(
         owner=RNS.Transport,
         configuration=CONFIG,
     )

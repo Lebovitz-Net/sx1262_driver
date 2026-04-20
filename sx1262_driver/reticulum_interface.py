@@ -9,7 +9,7 @@ enabling mesh networking capabilities using the sx1262_driver module.
 Configuration example (in ~/.reticulum/config):
 
     [[SX1262 LoRa Interface]]
-      type = SX1262ReticulumInterface
+      type = SX1262Interface
       enabled = yes
       name = sx1262_lora
       
@@ -55,7 +55,7 @@ from .sx1262_constants import (
 )
 
 
-class SX1262ReticulumInterface(Interface):
+class SX1262Interface(Interface):
     """
     Reticulum interface for SX1262 LoRa transceiver.
     
@@ -459,4 +459,4 @@ class SX1262ReticulumInterface(Interface):
     
     def __str__(self):
         """String representation for logging."""
-        return f"SX1262ReticulumInterface[{self.name}]"
+        return f"SX1262Interface[{self.name}]"
