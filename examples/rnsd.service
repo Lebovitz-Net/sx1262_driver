@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=gregg
+WorkingDirectory=/home/gregg
 SupplementaryGroups=spi gpio
 ExecStart=/home/gregg/.venv/bin/rnsd -s
 Restart=on-failure
