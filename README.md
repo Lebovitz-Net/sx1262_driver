@@ -1,4 +1,4 @@
-﻿# Introduction
+# Introduction
 
 The **sx1262_driver** project provides a clean, maintainable, and hardware‑accurate Python driver for the Semtech **SX1262** LoRa transceiver. Unlike many hobby‑grade libraries, this driver is built with **architectural rigor**, **predictable timing**, and **explicit separation of concerns**, making it suitable for real‑world mesh networking, experimentation, and educational use.
 
@@ -239,7 +239,7 @@ Add the following options to your `[[SX1262 LoRa Interface]]` block in `~/.retic
 
 ```ini
 [[SX1262 LoRa Interface]]
-  type = RNodeInterface
+  type = SX1262ReticulumInterface
   enabled = yes
   # ... existing radio parameters ...
 
@@ -270,7 +270,7 @@ Add the following options to your `[[SX1262 LoRa Interface]]` block in `~/.retic
 
 ### Custom interface note
 
-The `RNodeInterface` explicitly sets `self.supports_discovery = True` so that the RNS discovery loop includes it. The base `Interface` class defaults this to `False`; only built-in types like `RNodeInterface` and `TCPInterface` set it automatically.
+The `SX1262ReticulumInterface` explicitly sets `self.supports_discovery = True` so that the RNS discovery loop includes it. The base `Interface` class defaults this to `False`; only built-in types like `RNodeInterface` and `TCPInterface` set it automatically.
 
 ### Checking status
 
