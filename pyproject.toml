@@ -31,7 +31,6 @@ reticulum = ["rns", "lxmf"]
 
 [project.scripts]
 sx1262-install-rns-interface = "sx1262_driver.install_rns_interface:main"
-sx1262-telemetry-beacon = "sx1262_driver.telemetry_beacon:main"
 
 [project.urls]
 Homepage = "https://github.com/yourname/sx1262-driver"

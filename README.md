@@ -118,7 +118,7 @@ The generated config includes a TCP backbone entry (`rns.noderage.org:4242`) and
 | Bandwidth | 125 kHz | |
 | Spreading Factor | SF9 | |
 | Coding Rate | 4/5 | |
-| Sync Word | 0x1424 | Reticulum standard |
+| Sync Word | 0x1424 | Reticulum standard; also used as the MeshCore "private" sync word — ensures interoperability between Reticulum and MeshCore nodes on the same channel |
 | Preamble | 18 symbols | Minimum for RNode compatibility |
 
 Adjust the GPIO pin assignments (`reset_pin`, `busy_pin`, `nss_pin`) in `~/.reticulum/config` for your specific wiring.
@@ -150,70 +150,6 @@ sudo journalctl -u rnsd -f   # follow logs
 ```
 
 The venv binary has a shebang pointing to the venv Python, so all venv packages (including `sx1262_driver` and `rns`) are available without activating the venv first.
-
----
-
-## Mesh map visibility
-
-[meshmap.reticulum.network](https://meshmap.reticulum.network) displays nodes that send LXMF telemetry with a fixed location. The `sx1262-telemetry-beacon` console script handles this without Sideband.
-
-### Install
-
-```bash
-pip install "sx1262_driver[reticulum]"
-```
-
-This adds `lxmf` to the dependencies along with `rns`.
-
-### Find a collector hash
-
-The meshmap collector address changes periodically. The easiest way to find the current one is to open Sideband on any device, go to **Settings → Telemetry**, enable telemetry, and copy the collector hash shown there. You can also browse the meshmap site for the current collector announcement.
-
-### Run manually
-
-```bash
-sx1262-telemetry-beacon \
-  --lat   37.7749 \
-  --lon  -122.4194 \
-  --alt   50 \
-  --name  "MyPi" \
-  --collector <32-hex-char-hash> \
-  --interval  300
-```
-
-Or store the settings in `~/.reticulum/telemetry_beacon.conf` (loaded automatically):
-
-```
---lat
-37.7749
---lon
--122.4194
---alt
-50
---name
-MyPi
---collector
-<32-hex-char-hash>
---interval
-300
-```
-
-Then just run `sx1262-telemetry-beacon` with no arguments.
-
-The beacon connects to the existing `rnsd` shared instance automatically, so `rnsd.service` must be running first.
-
-### Run as a systemd service
-
-Copy and edit the example unit file:
-
-```bash
-cp examples/telemetry_beacon.service /etc/systemd/system/
-# edit /etc/systemd/system/telemetry_beacon.service — set coordinates, name, collector
-sudo systemctl daemon-reload
-sudo systemctl enable --now telemetry_beacon.service
-```
-
-The unit depends on `rnsd.service` and starts after it.
 
 ---
 
@@ -281,5 +217,43 @@ rnstatus
 ```
 
 You should see `Mode : Gateway` on the SX1262 interface. The first announce fires after the initial proof-of-work stamp is computed (a few seconds on modern hardware). Subsequent announces respect `announce_interval`.
+
+---
+
+## MeshCore compatibility
+
+The SX1262 driver can also communicate with [MeshCore](https://meshcore.co.uk) nodes. MeshCore uses a different frequency and radio configuration from Reticulum, but shares the same LoRa sync word (`LORA_SYNC_WORD_PRIVATE = 0x1424`), which allows both stacks to coexist on hardware that can be reconfigured.
+
+The parameters below are taken from `examples/listener.py` and match the MeshCore default channel plan for North America:
+
+| Parameter | Value | Notes |
+|---|---|---|
+| Frequency | 910.525 MHz | MeshCore North America default |
+| Bandwidth | 62.5 kHz | Narrower than Reticulum |
+| Spreading Factor | SF7 | Shorter range, higher throughput |
+| Coding Rate | 4/5 | |
+| Sync Word | 0x1424 (`LORA_SYNC_WORD_PRIVATE`) | Same as Reticulum — shared private network |
+| RX Timeout | `RX_CONTINUOUS` | Listen continuously |
+
+To use the driver with MeshCore parameters, configure the `SX1262` instance as shown in `examples/listener.py`:
+
+```python
+from sx1262_driver.sx1262_constants import *
+from sx1262_driver.sx1262 import SX1262
+
+radio = SX1262(
+    spi_bus=0, spi_device=0,
+    reset_pin=18, busy_pin=20, nss_pin=21
+)
+radio.begin(
+    freq=910525000,
+    bw=62500,
+    sf=7,
+    cr=5,
+    sync_word=LORA_SYNC_WORD_PRIVATE,
+)
+```
+
+> **Note:** The Reticulum interface (`rnsd`) uses different radio parameters (914.875 MHz, 125 kHz BW, SF9). You cannot run both stacks simultaneously on a single radio — each requires its own `SX1262` instance or a full reconfiguration between modes.
 
 
