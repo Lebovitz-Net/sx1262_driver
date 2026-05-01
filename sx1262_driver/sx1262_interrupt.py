@@ -51,6 +51,8 @@ class SX1262Interrupt:
                 from lgpio import gpio_write # type: ignore - pi only
                 gpio_write(self.gpio_chip, self._txen, self._tx_state)
 
+            # Errata §15.3 fix (currently a no-op stub — see _fix_rx_timeout in
+            # sx1262_common.py for conditions required to activate it)
             self._fix_rx_timeout()
         
         # if self._status_wait == STATUS_RX_CONTINUOUS:

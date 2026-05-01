@@ -104,4 +104,22 @@ class SX1262Common:
         if not ok:
             raise RuntimeError("Failed to enter RX mode.")
         return True
+
+    def _fix_rx_timeout(self):
+        # SX1262 errata §15.3 — RX timeout with implicit header mode.
+        # After a timed-out RX in implicit header mode, the chip may fail to
+        # return to its fallback state. The fix stops the internal RTC timer
+        # and masks the RTC event immediately after the timeout IRQ fires.
+        #
+        # CONDITIONS REQUIRED before enabling:
+        #   1. Using implicit header mode (set via set_packet_params with header=1)
+        #   2. Using a finite SetRx timeout (not RX_CONTINUOUS = 0xFFFFFF)
+        #
+        # Currently not applicable — driver uses explicit header mode and
+        # continuous RX. Implement when either condition above is added:
+        #
+        # self.write_register(0x0902, bytes([0x00]), 1)         # stop RTC timer
+        # val = self.read_register(0x0944, 1)[0]
+        # self.write_register(0x0944, bytes([val | 0x02]), 1)   # mask RTC event
+        pass
     

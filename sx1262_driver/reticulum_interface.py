@@ -336,6 +336,17 @@ class SX1262Interface(Interface):
                 f"SNR={self.radio.snr():.1f}dB",
                 RNS.LOG_INFO
             )
+            # Log / print packet contents (hex), truncated for large packets
+            try:
+                hex_data = data.hex()
+            except Exception:
+                hex_data = repr(data)
+            # Limit hex output to a typical console line (~120 chars)
+            if len(hex_data) > 120:
+                hex_data = hex_data[:120] + "..."
+            self.logger(f"SX1262 Interface: RX PACKET ({len(data)} bytes): {hex_data}", RNS.LOG_DEBUG)
+            # Also print to stdout for quick debugging
+            print(f"SX1262 RX PACKET ({len(data)} bytes): {hex_data}")
             self.process_incoming(data)
         except Exception as e:
             self.logger(f"SX1262 Interface: RX_DONE handler error: {e}", RNS.LOG_ERROR)
