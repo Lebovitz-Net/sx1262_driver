@@ -19,7 +19,7 @@ SPI_DEV = 0
 # ------------------------------------------------------------
 # Radio parameters
 # ------------------------------------------------------------
-FREQUENCY_HZ = 910525000   # 910.525 MHz
+FREQUENCY_HZ = 914875000   # 914.875 MHz (Reticulum default)
 BANDWIDTH_HZ = 62500        # 62.5 kHz
 SPREADING_FACTOR = 7
 CODING_RATE = 5              # 4/5
